@@ -180,6 +180,34 @@
   .auth-card {
     @apply bg-card border border-border rounded-2xl shadow-2xl;
   }
+
+  /* Landing section consistent spacing */
+  .landing-section {
+    @apply py-28;
+  }
+
+  /* Capability card — interactive with hover reveal */
+  .capability-card {
+    @apply bg-card border border-border rounded-2xl p-7 transition-all duration-300 cursor-default;
+    @apply hover:border-emerald-500/30 hover:shadow-glow-emerald hover:-translate-y-0.5;
+  }
+
+  /* Deep learning model card */
+  .model-card {
+    @apply bg-card border border-border rounded-xl p-6 transition-all duration-300;
+    @apply hover:border-emerald-500/25 hover:bg-secondary/40;
+  }
+
+  /* Noise texture overlay */
+  .noise-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+
+  /* Staggered children animation */
+  .stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger-children > *:nth-child(2) { animation-delay: 80ms; }
+  .stagger-children > *:nth-child(3) { animation-delay: 160ms; }
+  .stagger-children > *:nth-child(4) { animation-delay: 240ms; }
 }
 
 @layer utilities {
@@ -212,6 +240,18 @@
   .animate-pulse-slow {
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
+
+  /* Float animation for dashboard preview */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  /* Shimmer animation */
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+    background: linear-gradient(90deg, transparent 0%, rgba(16,185,129,0.06) 50%, transparent 100%);
+    background-size: 200% 100%;
+  }
 }
 
 /* Keyframes */
@@ -228,6 +268,16 @@
 @keyframes slideInRight {
   from { opacity: 0; transform: translateX(16px); }
   to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
 }
 
 /* Sonner toast overrides */
