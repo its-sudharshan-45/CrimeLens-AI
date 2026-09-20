@@ -1,95 +1,116 @@
-import { X, Check } from 'lucide-react';
+// Repurposed as DeepLearningSection — showcases the 4 AI models powering CrimeLens
 
-const traditional = [
-  'Manual case file review',
-  'Reactive investigation approach',
-  'Siloed data across departments',
-  'Time-intensive pattern analysis',
-  'Paper-based evidence tracking',
-  'Limited cross-case linking',
-  'Delayed resource allocation',
-];
+type Model = {
+  id: string;
+  acronym: string;
+  name: string;
+  role: string;
+  description: string;
+  accent: string;
+  bg: string;
+  border: string;
+};
 
-const aiAssisted = [
-  'Automated data synthesis & analysis',
-  'Proactive crime prevention insights',
-  'Centralized, integrated data platform',
-  'Real-time AI pattern recognition',
-  'Digital evidence chain-of-custody',
-  'Intelligent cross-case correlation',
-  'Optimized, data-driven deployment',
-];
-
-const highlights = [
-  { metric: '10×', label: 'Faster Analysis' },
-  { metric: '94.7%', label: 'Prediction Accuracy' },
-  { metric: '60%', label: 'Reduced Response Time' },
-  { metric: '3×', label: 'More Cases Solved' },
+const models: Model[] = [
+  {
+    id: 'gru',
+    acronym: 'GRU',
+    name: 'Gated Recurrent Unit',
+    role: 'Temporal Pattern Prediction',
+    description:
+      'Learns sequential dependencies in crime time-series to forecast likely future crime occurrences across time windows.',
+    accent: 'text-emerald-400',
+    bg: 'bg-emerald-500/6',
+    border: 'border-emerald-500/15',
+  },
+  {
+    id: 'cnn',
+    acronym: 'CNN',
+    name: 'Convolutional Neural Net',
+    role: 'Spatial Hotspot Analysis',
+    description:
+      'Extracts spatial feature hierarchies from geographic crime data to identify concentrated high-risk zones.',
+    accent: 'text-blue-400',
+    bg: 'bg-blue-500/6',
+    border: 'border-blue-500/15',
+  },
+  {
+    id: 'ft',
+    acronym: 'FT-T',
+    name: 'FT-Transformer',
+    role: 'Complex Feature Relationships',
+    description:
+      'Applies attention mechanisms to tabular crime features, capturing non-linear relationships across categorical and numerical inputs.',
+    accent: 'text-violet-400',
+    bg: 'bg-violet-500/6',
+    border: 'border-violet-500/15',
+  },
+  {
+    id: 'nbeats',
+    acronym: 'N-BEATS',
+    name: 'Neural Basis Expansion',
+    role: 'Time-Series Forecasting',
+    description:
+      'Provides interpretable decomposition of crime time-series into trend and seasonality components for precise long-horizon forecasts.',
+    accent: 'text-amber-400',
+    bg: 'bg-amber-500/6',
+    border: 'border-amber-500/15',
+  },
 ];
 
 export function ComparisonSection() {
   return (
-    <section className="py-24 section-divider">
+    <section id="deep-learning" className="landing-section section-divider bg-secondary/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
-          <p className="text-sm font-semibold text-emerald-500 tracking-widest uppercase mb-3">
-            Why CrimeLens AI
+        <div className="max-w-xl mb-16">
+          <p className="text-xs font-semibold text-emerald-500 tracking-[0.15em] uppercase mb-4">
+            Deep Learning
           </p>
-          <h2 className="heading-lg text-foreground mb-4">
-            Transform Your Investigation Capability
+          <h2 className="text-4xl md:text-[44px] font-bold tracking-tight leading-tight text-foreground mb-5">
+            Built on{' '}
+            <span className="text-muted-foreground font-normal">Deep Learning.</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-base leading-relaxed">
-            See how AI-assisted investigation compares to traditional methods across
-            key operational dimensions.
+          <p className="text-base text-muted-foreground leading-relaxed">
+            Multiple specialized models analyze different dimensions of crime patterns — each optimized for its domain.
           </p>
         </div>
 
-        {/* Comparison Grid */}
-        <div className="grid md:grid-cols-2 gap-6 mb-14">
-          {/* Traditional */}
-          <div className="bg-card border border-border rounded-2xl p-6">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                <X size={14} className="text-red-400" />
-              </div>
-              <h3 className="text-base font-semibold text-foreground">Traditional Investigation</h3>
-            </div>
-            <ul className="space-y-3">
-              {traditional.map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <X size={14} className="text-red-400/60 shrink-0 mt-0.5" />
-                  <span className="text-sm text-muted-foreground">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* Model grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {models.map((model, index) => (
+            <div
+              key={model.id}
+              className="model-card group animate-fade-in relative overflow-hidden"
+              style={{ animationDelay: `${index * 90}ms` }}
+            >
+              {/* Subtle corner accent */}
+              <div
+                className={`absolute top-0 right-0 w-24 h-24 rounded-bl-full opacity-30 pointer-events-none transition-opacity duration-300 group-hover:opacity-50 ${model.bg}`}
+              />
 
-          {/* AI-Assisted */}
-          <div className="bg-card border border-emerald-500/20 rounded-2xl p-6 shadow-glow-emerald">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                <Check size={14} className="text-emerald-400" />
-              </div>
-              <h3 className="text-base font-semibold text-foreground">AI-Assisted Investigation</h3>
-            </div>
-            <ul className="space-y-3">
-              {aiAssisted.map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <Check size={14} className="text-emerald-400 shrink-0 mt-0.5" />
-                  <span className="text-sm text-foreground/80">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+              <div className="relative">
+                {/* Acronym badge */}
+                <div className="flex items-center gap-3 mb-5">
+                  <div
+                    className={`px-3 py-1.5 rounded-lg text-sm font-bold font-mono tracking-wide border ${model.bg} ${model.border} ${model.accent}`}
+                  >
+                    {model.acronym}
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold text-muted-foreground tracking-wide uppercase">
+                      {model.role}
+                    </p>
+                  </div>
+                </div>
 
-        {/* Highlight metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {highlights.map((h) => (
-            <div key={h.label} className="text-center p-5 bg-secondary/40 border border-border rounded-xl">
-              <p className="text-3xl font-bold text-emerald-gradient mb-1">{h.metric}</p>
-              <p className="text-xs text-muted-foreground">{h.label}</p>
+                <h3 className="text-base font-semibold text-foreground mb-2 tracking-tight">
+                  {model.name}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {model.description}
+                </p>
+              </div>
             </div>
           ))}
         </div>
