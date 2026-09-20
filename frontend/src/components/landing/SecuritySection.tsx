@@ -1,95 +1,49 @@
-import {
-  KeyRound,
-  ShieldCheck,
-  HardDriveDownload,
-  ScrollText,
-  FileKey,
-  Globe,
-  BadgeCheck,
-} from 'lucide-react';
-
-const securityFeatures = [
-  {
-    icon: KeyRound,
-    title: 'Encrypted Authentication',
-    description: 'Industry-standard bcrypt password hashing and TLS-encrypted data transmission protect all credentials.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Secure Access Control',
-    description: 'Verified authentication ensures only authorized personnel access sensitive investigation data and system capabilities.',
-  },
-  {
-    icon: HardDriveDownload,
-    title: 'Secure Evidence Storage',
-    description: 'Evidence files stored in encrypted cloud storage with signed URLs and strict access policies.',
-  },
-  {
-    icon: ScrollText,
-    title: 'Audit Logging',
-    description: 'Every system action is logged with user identity, timestamp, and IP address for full accountability.',
-  },
-  {
-    icon: FileKey,
-    title: 'JWT Verification',
-    description: 'Stateless JWT tokens with automatic refresh and server-side validation prevent unauthorized access.',
-  },
-  {
-    icon: Globe,
-    title: 'Protected APIs',
-    description: 'All backend endpoints enforce authentication middleware, rate limiting, and CORS policies.',
-  },
-];
+// Repurposed as ResponsibleAISection — "Decision Support, Not Decision Making."
 
 export function SecuritySection() {
   return (
-    <section id="security" className="py-24 bg-secondary/20 section-divider">
+    <section id="responsible-ai" className="landing-section section-divider">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <p className="text-sm font-semibold text-emerald-500 tracking-widest uppercase mb-3">
-            Enterprise Security
+        <div className="max-w-3xl mx-auto">
+          {/* Eyebrow */}
+          <p className="text-xs font-semibold text-emerald-500 tracking-[0.15em] uppercase mb-10">
+            Responsible AI
           </p>
-          <h2 className="heading-lg text-foreground mb-4">
-            Built for High-Stakes Environments
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-base leading-relaxed">
-            CrimeLens AI implements defense-in-depth security principles across every layer —
-            from authentication to storage to API access.
-          </p>
-        </div>
 
-        {/* Security tiles */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-          {securityFeatures.map((feature) => (
+          {/* Large quote */}
+          <blockquote className="relative">
+            {/* Quote mark */}
             <div
-              key={feature.title}
-              className="bg-card border border-border rounded-xl p-5 hover:border-emerald-500/20 transition-all duration-200 group"
+              className="absolute -top-4 -left-2 text-[96px] leading-none text-emerald-500/10 font-serif select-none pointer-events-none"
+              aria-hidden="true"
             >
-              <div className="flex items-start gap-4">
-                <div className="w-9 h-9 rounded-lg bg-emerald-500/8 border border-emerald-500/12 flex items-center justify-center shrink-0 group-hover:bg-emerald-500/12 transition-colors">
-                  <feature.icon size={16} className="text-emerald-500" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-foreground mb-1.5">{feature.title}</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{feature.description}</p>
-                </div>
-              </div>
+              &ldquo;
             </div>
-          ))}
-        </div>
 
-        {/* Certification badge row */}
-        <div className="flex flex-wrap items-center justify-center gap-4">
-          {['Enterprise Grade', 'SOC 2 Ready', 'GDPR Compliant', 'End-to-End Encrypted'].map((cert) => (
-            <div
-              key={cert}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border text-sm text-muted-foreground"
-            >
-              <BadgeCheck size={14} className="text-emerald-500" />
-              {cert}
+            <h2 className="text-4xl md:text-5xl lg:text-[52px] font-bold tracking-[-0.025em] leading-[1.1] text-foreground mb-8 relative">
+              Decision Support,{' '}
+              <span className="text-muted-foreground font-normal">Not Decision Making.</span>
+            </h2>
+          </blockquote>
+
+          {/* Disclaimer */}
+          <div className="border-l-2 border-emerald-500/30 pl-6">
+            <p className="text-base text-muted-foreground leading-relaxed max-w-2xl">
+              CrimeLens AI provides probabilistic insights based on available data. Predictions are
+              intended to support human analysis and should be interpreted alongside verified evidence,
+              investigation context, and professional judgment.
+            </p>
+          </div>
+
+          {/* Subtle visual separator */}
+          <div className="mt-12 flex items-center gap-4">
+            <div className="flex-1 h-px bg-border" />
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/40 border border-border">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
+              <span className="text-xs text-muted-foreground font-medium">Human-centered intelligence</span>
             </div>
-          ))}
+            <div className="flex-1 h-px bg-border" />
+          </div>
         </div>
       </div>
     </section>
