@@ -1,0 +1,51 @@
+# Dependencies & virtual environments
+node_modules/
+.venv/
+venv/
+env/
+
+# Secrets & local config
+.env
+.env.*
+!.env.example
+!**/.env.example
+backend/.env
+frontend/.env
+
+# Build outputs & caches
+dist/
+build/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.mypy_cache/
+.vite/
+frontend/dist/
+
+# Logs, backups, local DB snapshots
+logs/
+backups/
+backend/backups/
+*.snapshot
+*.log
+
+# Large generated data & ML weights
+datasets/raw/*
+datasets/processed/*
+*.pt
+*.pth
+*.pkl
+ai/checkpoints/
+catboost_info/
+ai/artifacts/**/*.png
+ai/artifacts/**/*.csv
+
+# IDE & OS
+.git/
+.github/
+.idea/
+.vscode/
+.cursor/
+.DS_Store
+Thumbs.db

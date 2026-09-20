@@ -1,0 +1,30 @@
+{
+    "feature_columns": [
+        "Victim Age",
+        "City_encoded",
+        "State_encoded",
+        "Victim Gender_encoded",
+        "Weapon Used_encoded",
+        "Year",
+        "Month",
+        "Day",
+        "Weekday",
+        "Hour",
+        "Is_Weekend",
+        "Quarter",
+        "sin_month",
+        "cos_month",
+        "sin_hour",
+        "cos_hour",
+        "sin_weekday",
+        "cos_weekday",
+        "City_Crime_Freq",
+        "State_Crime_Freq",
+        "Category_Freq",
+        "City_Mean_Police",
+        "City_Closure_Rate",
+        "State_Mean_Police",
+        "State_Closure_Rate",
+        "Reporting_Lag_Hours"
+    ]
+}

@@ -1,0 +1,9 @@
+from enum import Enum
+
+class PredictionType(str, Enum):
+    CRIME_TYPE = "CRIME_TYPE"
+    HOTSPOT = "HOTSPOT"
+    TREND = "TREND"
+    RISK_SCORE = "RISK_SCORE"
+    RESOURCE_ALLOCATION = "RESOURCE_ALLOCATION"
+    SIMILAR_CASE = "SIMILAR_CASE"

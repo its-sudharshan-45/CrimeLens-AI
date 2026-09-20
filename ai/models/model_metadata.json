@@ -1,0 +1,10 @@
+{
+    "version": "v1.0.0",
+    "flagship_model": "FTTransformerClassifier",
+    "forecaster_model": "NBEATSForecaster",
+    "dataset_rows": 40160,
+    "saved_at": "2026-07-24T20:45:08.837408",
+    "dataset_hash_md5": "9bb143539b74ecef9274f167603bb490",
+    "framework": "PyTorch 2.12.0+cpu",
+    "device": "cpu"
+}

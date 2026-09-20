@@ -1,0 +1,57 @@
+{
+    "FTTransformerClassifier": {
+        "model_name": "FTTransformerClassifier",
+        "device": "cpu",
+        "batch_size": 32,
+        "mean_latency_ms_per_sample": 0.15,
+        "std_latency_ms": 0.0419,
+        "throughput_samples_per_sec": 6668.18,
+        "peak_memory_mb": 0.005,
+        "total_parameters": 28356,
+        "model_file_size_mb": 0.0
+    },
+    "ResidualMLPClassifier": {
+        "model_name": "ResidualMLPClassifier",
+        "device": "cpu",
+        "batch_size": 32,
+        "mean_latency_ms_per_sample": 0.0558,
+        "std_latency_ms": 0.0094,
+        "throughput_samples_per_sec": 17915.52,
+        "peak_memory_mb": 0.003,
+        "total_parameters": 184696,
+        "model_file_size_mb": 0.0
+    },
+    "EnsembleClassifier": {
+        "model_name": "EnsembleClassifier",
+        "device": "cpu",
+        "batch_size": 32,
+        "mean_latency_ms_per_sample": 0.1809,
+        "std_latency_ms": 0.1441,
+        "throughput_samples_per_sec": 5527.8,
+        "peak_memory_mb": 0.004,
+        "total_parameters": 213052,
+        "model_file_size_mb": 0.0
+    },
+    "NBEATSForecaster": {
+        "model_name": "NBEATSForecaster",
+        "device": "cpu",
+        "batch_size": 32,
+        "mean_latency_ms_per_sample": 0.1994,
+        "std_latency_ms": 0.0396,
+        "throughput_samples_per_sec": 5015.37,
+        "peak_memory_mb": 0.004,
+        "total_parameters": 1941870,
+        "model_file_size_mb": 0.0
+    },
+    "CrimeEmbeddingNetwork": {
+        "model_name": "CrimeEmbeddingNetwork",
+        "device": "cpu",
+        "batch_size": 32,
+        "mean_latency_ms_per_sample": 0.0229,
+        "std_latency_ms": 0.0066,
+        "throughput_samples_per_sec": 43730.48,
+        "peak_memory_mb": 0.002,
+        "total_parameters": 65344,
+        "model_file_size_mb": 0.0
+    }
+}

@@ -1,0 +1,61 @@
+{
+    "model": "FTTransformerClassifier",
+    "n_splits": 5,
+    "folds": [
+        {
+            "fold": 1,
+            "accuracy": 0.5713,
+            "precision": 0.3264,
+            "recall": 0.5713,
+            "f1_score": 0.4155,
+            "roc_auc": 0.4981
+        },
+        {
+            "fold": 2,
+            "accuracy": 0.5713,
+            "precision": 0.3264,
+            "recall": 0.5713,
+            "f1_score": 0.4155,
+            "roc_auc": 0.4994
+        },
+        {
+            "fold": 3,
+            "accuracy": 0.5715,
+            "precision": 0.3266,
+            "recall": 0.5715,
+            "f1_score": 0.4156,
+            "roc_auc": 0.5002
+        },
+        {
+            "fold": 4,
+            "accuracy": 0.5715,
+            "precision": 0.3266,
+            "recall": 0.5715,
+            "f1_score": 0.4156,
+            "roc_auc": 0.4972
+        },
+        {
+            "fold": 5,
+            "accuracy": 0.5715,
+            "precision": 0.3266,
+            "recall": 0.5715,
+            "f1_score": 0.4156,
+            "roc_auc": 0.4953
+        }
+    ],
+    "mean_metrics": {
+        "accuracy_mean": 0.5714,
+        "accuracy_std": 0.0001,
+        "f1_score_mean": 0.4156,
+        "f1_score_std": 0.0,
+        "roc_auc_mean": 0.498
+    },
+    "best_fold": {
+        "fold": 3,
+        "f1_score": 0.4156
+    },
+    "worst_fold": {
+        "fold": 1,
+        "f1_score": 0.4155
+    }
+}

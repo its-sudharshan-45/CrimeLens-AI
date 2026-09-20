@@ -1,0 +1,13 @@
+{
+    "input_dim": 26,
+    "num_classes": 4,
+    "d_token": 32,
+    "n_heads": 4,
+    "n_layers": 2,
+    "batch_size": 64,
+    "optimizer": "AdamW",
+    "scheduler": "CosineAnnealingLR",
+    "loss_function": "FocalLoss",
+    "embedding_dim": 64,
+    "forecast_horizon": 7
+}

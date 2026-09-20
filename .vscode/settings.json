@@ -1,0 +1,26 @@
+{
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore",
+  "cSpell.words": [
+    "nbeats",
+    "NBEATS",
+    "catboost",
+    "CatBoost",
+    "captum",
+    "Captum",
+    "probas",
+    "proba",
+    "linalg",
+    "ASGI",
+    "fcst",
+    "testkey",
+    "testsecret",
+    "crimelens",
+    "CrimeLens",
+    "joblib",
+    "scikit",
+    "torchvision",
+    "torchmetrics",
+    "tensorboard"
+  ]
+}

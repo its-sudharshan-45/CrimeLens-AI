@@ -1,0 +1,127 @@
+# ── Dependencies ──────────────────────────────────────────────────────────────
+node_modules/
+.pnpm-store/
+
+# ── Build & bundle outputs ─────────────────────────────────────────────────────
+dist/
+build/
+*.tsbuildinfo
+.vite/
+.parcel-cache/
+.turbo/
+.next/
+out/
+
+# ── Python ─────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# uv
+.uv/
+
+# ── Environment & secrets (never commit) ───────────────────────────────────────
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# ── IDE & editor ───────────────────────────────────────────────────────────────
+.idea/
+*.swp
+*.swo
+*~
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.cursor/
+
+# ── OS junk ────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# ── Logs & runtime ─────────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ── Docker local state ─────────────────────────────────────────────────────────
+.docker/
+
+# ── Database & backup snapshots ────────────────────────────────────────────────
+backups/
+backend/backups/
+*.snapshot
+*.sql.gz
+*.dump
+
+# ── ML training artifacts (keep source code & metadata) ────────────────────────
+# Model weights & checkpoints
+*.pt
+*.pth
+*.pkl
+# TorchScript exports (exporter uses .ts extension — not TypeScript source)
+ai/**/*.ts
+*.pickle
+*.onnx
+*.bin
+*.safetensors
+*.h5
+*.ckpt
+*.joblib
+
+ai/checkpoints/
+ai/tensorboard/
+catboost_info/
+
+# Generated EDA / training plots & large feature exports
+ai/artifacts/**/*.png
+ai/artifacts/**/*.csv
+ai/artifacts/**/__pycache__/
+
+# Processed dataset artifacts (regenerate via backend/scripts or ai/preprocessing)
+datasets/raw/*
+datasets/processed/*
+!datasets/raw/.gitkeep
+!datasets/processed/.gitkeep
+
+# Local vector store payloads
+backend/vector_store/*
+!backend/vector_store/.gitkeep
+
+# ── Jupyter ────────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ── Misc caches ────────────────────────────────────────────────────────────────
+.cache/
+*.tmp
+*.temp
+*.bak

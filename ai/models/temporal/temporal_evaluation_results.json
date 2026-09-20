@@ -1,0 +1,195 @@
+{
+  "evaluation_date": [
+    "2024-01-01",
+    "2024-07-31"
+  ],
+  "target": "total_crimes (unscaled incident counts)",
+  "primary_model": "GRU",
+  "global_metrics": {
+    "LSTM": {
+      "MAE": 0.0132,
+      "RMSE": 0.4204,
+      "MAPE": 0.15,
+      "sMAPE": 0.08,
+      "R2": -0.001,
+      "params": 53959,
+      "training_time_sec": 4.57,
+      "input_type": "Multivariate (13 features)"
+    },
+    "GRU": {
+      "MAE": 0.0131,
+      "RMSE": 0.4203,
+      "MAPE": 0.15,
+      "sMAPE": 0.08,
+      "R2": -0.0007,
+      "params": 40583,
+      "training_time_sec": 14.94,
+      "input_type": "Multivariate (13 features)"
+    },
+    "N-BEATS": {
+      "MAE": 0.3047,
+      "RMSE": 0.5399,
+      "MAPE": 1.36,
+      "sMAPE": 1.28,
+      "R2": -0.651,
+      "params": 1941870,
+      "training_time_sec": "Pre-trained",
+      "input_type": "Univariate (total_crimes only)"
+    }
+  },
+  "per_day_metrics": {
+    "LSTM": {
+      "Day +1": {
+        "MAE": 0.0027,
+        "RMSE": 0.0033,
+        "MAPE": 0.01,
+        "sMAPE": 0.01,
+        "R2": 0.0
+      },
+      "Day +2": {
+        "MAE": 0.0016,
+        "RMSE": 0.0019,
+        "MAPE": 0.01,
+        "sMAPE": 0.01,
+        "R2": 0.0
+      },
+      "Day +3": {
+        "MAE": 0.0014,
+        "RMSE": 0.0017,
+        "MAPE": 0.01,
+        "sMAPE": 0.01,
+        "R2": 0.0
+      },
+      "Day +4": {
+        "MAE": 0.0026,
+        "RMSE": 0.0031,
+        "MAPE": 0.01,
+        "sMAPE": 0.01,
+        "R2": 0.0
+      },
+      "Day +5": {
+        "MAE": 0.0013,
+        "RMSE": 0.0017,
+        "MAPE": 0.01,
+        "sMAPE": 0.01,
+        "R2": 0.0
+      },
+      "Day +6": {
+        "MAE": 0.0011,
+        "RMSE": 0.0013,
+        "MAPE": 0.0,
+        "sMAPE": 0.0,
+        "R2": 0.0
+      },
+      "Day +7": {
+        "MAE": 0.0816,
+        "RMSE": 1.1122,
+        "MAPE": 0.98,
+        "sMAPE": 0.5,
+        "R2": -0.0052
+      }
+    },
+    "GRU": {
+      "Day +1": {
+        "MAE": 0.0014,
+        "RMSE": 0.0019,
+        "MAPE": 0.01,
+        "sMAPE": 0.01,
+        "R2": 0.0
+      },
+      "Day +2": {
+        "MAE": 0.0021,
+        "RMSE": 0.0027,
+        "MAPE": 0.01,
+        "sMAPE": 0.01,
+        "R2": 0.0
+      },
+      "Day +3": {
+        "MAE": 0.0033,
+        "RMSE": 0.004,
+        "MAPE": 0.01,
+        "sMAPE": 0.01,
+        "R2": 0.0
+      },
+      "Day +4": {
+        "MAE": 0.002,
+        "RMSE": 0.0025,
+        "MAPE": 0.01,
+        "sMAPE": 0.01,
+        "R2": 0.0
+      },
+      "Day +5": {
+        "MAE": 0.0023,
+        "RMSE": 0.0029,
+        "MAPE": 0.01,
+        "sMAPE": 0.01,
+        "R2": 0.0
+      },
+      "Day +6": {
+        "MAE": 0.0012,
+        "RMSE": 0.0016,
+        "MAPE": 0.01,
+        "sMAPE": 0.01,
+        "R2": 0.0
+      },
+      "Day +7": {
+        "MAE": 0.0795,
+        "RMSE": 1.1121,
+        "MAPE": 0.98,
+        "sMAPE": 0.49,
+        "R2": -0.0048
+      }
+    },
+    "N-BEATS": {
+      "Day +1": {
+        "MAE": 0.1201,
+        "RMSE": 0.1201,
+        "MAPE": 0.5,
+        "sMAPE": 0.5,
+        "R2": 0.0
+      },
+      "Day +2": {
+        "MAE": 0.1562,
+        "RMSE": 0.1562,
+        "MAPE": 0.65,
+        "sMAPE": 0.65,
+        "R2": 0.0
+      },
+      "Day +3": {
+        "MAE": 0.3896,
+        "RMSE": 0.3896,
+        "MAPE": 1.62,
+        "sMAPE": 1.61,
+        "R2": 0.0
+      },
+      "Day +4": {
+        "MAE": 0.5082,
+        "RMSE": 0.5082,
+        "MAPE": 2.12,
+        "sMAPE": 2.1,
+        "R2": 0.0
+      },
+      "Day +5": {
+        "MAE": 0.1429,
+        "RMSE": 0.1429,
+        "MAPE": 0.6,
+        "sMAPE": 0.59,
+        "R2": 0.0
+      },
+      "Day +6": {
+        "MAE": 0.3473,
+        "RMSE": 0.3473,
+        "MAPE": 1.45,
+        "sMAPE": 1.44,
+        "R2": 0.0
+      },
+      "Day +7": {
+        "MAE": 0.4688,
+        "RMSE": 1.2044,
+        "MAPE": 2.61,
+        "sMAPE": 2.1,
+        "R2": -0.1786
+      }
+    }
+  }
+}
