@@ -1,89 +1,89 @@
-import {
-  Database,
-  Cpu,
-  Network,
-  TrendingUp,
-  Briefcase,
-  CheckCircle2,
-} from 'lucide-react';
+import { Database, Cpu, BarChart3 } from 'lucide-react';
 
 const steps = [
   {
+    number: '01',
     icon: Database,
-    title: 'Crime Data Collection',
-    description: 'Historical crime records, incident reports, geographic data, and contextual factors are ingested from multiple sources.',
+    title: 'Analyze Data',
+    description:
+      'Process historical crime records and extract relevant spatial, temporal, and contextual features.',
   },
   {
+    number: '02',
     icon: Cpu,
-    title: 'AI Analysis',
-    description: 'Machine learning models process and normalize data, identifying statistical anomalies and significant variables.',
+    title: 'Learn Patterns',
+    description:
+      'Deep-learning models identify temporal, spatial, and feature relationships within the data.',
   },
   {
-    icon: Network,
-    title: 'Pattern Recognition',
-    description: 'Deep learning algorithms detect recurring crime patterns, correlations, and seasonal trends across time and geography.',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Crime Prediction',
-    description: 'Predictive models generate geo-temporal risk scores, forecasting likely crime type, location, and time window.',
-  },
-  {
-    icon: Briefcase,
-    title: 'Investigation Support',
-    description: 'AI-generated intelligence links cases, suggests leads, and surfaces relevant evidence to support active investigations.',
-  },
-  {
-    icon: CheckCircle2,
-    title: 'Decision Making',
-    description: 'Officers and commanders receive actionable, data-driven insights to inform resource allocation and prevention strategies.',
+    number: '03',
+    icon: BarChart3,
+    title: 'Generate Insights',
+    description:
+      'Visualize patterns, predictions, hotspots, and investigation intelligence in one workspace.',
   },
 ];
 
 export function HowItWorksSection() {
   return (
-    <section id="about" className="py-24 bg-secondary/20 section-divider">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="landing-section section-divider">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
-          <p className="text-sm font-semibold text-emerald-500 tracking-widest uppercase mb-3">
-            The Process
+        <div className="max-w-xl mb-16">
+          <p className="text-xs font-semibold text-emerald-500 tracking-[0.15em] uppercase mb-4">
+            How It Works
           </p>
-          <h2 className="heading-lg text-foreground mb-4">How CrimeLens AI Works</h2>
-          <p className="text-muted-foreground max-w-xl mx-auto text-base leading-relaxed">
-            A six-stage intelligence pipeline transforming raw crime data into
-            actionable law enforcement insights.
+          <h2 className="text-4xl md:text-[44px] font-bold tracking-tight leading-tight text-foreground mb-5">
+            From Crime Data{' '}
+            <span className="text-muted-foreground font-normal">to Intelligence.</span>
+          </h2>
+          <p className="text-base text-muted-foreground leading-relaxed">
+            A three-stage intelligence pipeline that transforms raw data into actionable insight.
           </p>
         </div>
 
         {/* Steps */}
-        <div className="relative">
-          {/* Vertical connector line */}
-          <div className="absolute left-[19px] top-4 bottom-4 w-px bg-border hidden sm:block" />
-
-          <div className="space-y-6">
-            {steps.map((step, index) => (
-              <div key={step.title} className="relative flex gap-6 group">
-                {/* Step number + icon */}
-                <div className="relative shrink-0 flex flex-col items-center">
-                  <div className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center group-hover:border-emerald-500/30 group-hover:bg-emerald-500/5 transition-all duration-200 relative z-10">
-                    <step.icon size={16} className="text-emerald-500" />
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 pb-6 last:pb-0">
-                  <div className="flex items-center gap-3 mb-1.5">
-                    <span className="text-xs font-semibold text-emerald-500 tracking-wider">
-                      STEP {String(index + 1).padStart(2, '0')}
-                    </span>
-                  </div>
-                  <h3 className="text-base font-semibold text-foreground mb-1.5">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
-                </div>
-              </div>
-            ))}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+          {/* Connector line — desktop only */}
+          <div className="hidden md:block absolute top-8 left-[calc(16.66%+20px)] right-[calc(16.66%+20px)] h-px">
+            <div
+              className="w-full h-full"
+              style={{
+                background: 'linear-gradient(90deg, rgba(16,185,129,0.3) 0%, rgba(16,185,129,0.5) 50%, rgba(16,185,129,0.3) 100%)',
+              }}
+            />
+            {/* Arrow dots */}
+            <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
+            <div className="absolute top-1/2 left-2/3 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
           </div>
+
+          {steps.map((step, index) => (
+            <div
+              key={step.number}
+              className="relative group animate-fade-in"
+              style={{ animationDelay: `${index * 120}ms` }}
+            >
+              {/* Step container */}
+              <div className="bg-card border border-border rounded-2xl p-8 h-full transition-all duration-300 hover:border-emerald-500/25 hover:bg-secondary/30 hover:-translate-y-0.5">
+                {/* Number badge + icon */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/8 border border-emerald-500/15 group-hover:bg-emerald-500/15 group-hover:border-emerald-500/25 transition-all duration-300">
+                    <step.icon size={18} className="text-emerald-500" />
+                  </div>
+                  <span className="text-xs font-bold text-emerald-500/70 tracking-[0.15em] font-mono">
+                    — {step.number}
+                  </span>
+                </div>
+
+                <h3 className="text-lg font-semibold text-foreground mb-3 tracking-tight">
+                  {step.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {step.description}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
