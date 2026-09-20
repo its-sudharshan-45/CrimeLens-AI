@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ExternalLink } from 'lucide-react';
 import { Logo } from '@/components/common/Logo';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
-  { label: 'Home', href: '/' },
-  { label: 'Features', href: '#features' },
-  { label: 'Security', href: '#security' },
-  { label: 'About', href: '#about' },
+  { label: 'Overview', href: '#overview' },
+  { label: 'Capabilities', href: '#capabilities' },
+  { label: 'How It Works', href: '#how-it-works' },
 ];
 
 export function Navbar() {
@@ -18,7 +17,7 @@ export function Navbar() {
   const location = useLocation();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 24);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -38,8 +37,10 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        scrolled ? 'glass border-b border-white/5 shadow-lg' : 'bg-transparent'
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
+        scrolled
+          ? 'bg-charcoal-950/85 backdrop-blur-xl border-b border-white/5 shadow-[0_1px_0_rgba(255,255,255,0.04)]'
+          : 'bg-transparent'
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -48,36 +49,42 @@ export function Navbar() {
           <Logo size="md" />
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-6" aria-label="Main navigation">
+          <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
                 onClick={(e) => handleAnchor(e, link.href)}
-                className="nav-link"
+                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-150 rounded-lg hover:bg-white/4"
               >
                 {link.label}
               </a>
             ))}
           </nav>
 
-          {/* Desktop Actions */}
+          {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
             <Link to="/login">
-              <Button variant="ghost" size="sm" id="nav-login-btn">
+              <Button variant="ghost" size="sm" id="nav-login-btn" className="text-muted-foreground hover:text-foreground">
                 Log In
               </Button>
             </Link>
-            <Link to="/signup">
-              <Button variant="primary" size="sm" id="nav-signup-btn">
-                Get Started
+            <Link to="/dashboard">
+              <Button
+                variant="primary"
+                size="sm"
+                id="nav-open-dashboard-btn"
+                className="gap-1.5 font-medium"
+              >
+                Open Dashboard
+                <ExternalLink size={12} />
               </Button>
             </Link>
           </div>
 
-          {/* Mobile Menu Toggle */}
+          {/* Mobile Toggle */}
           <button
-            className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-white/4"
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Toggle menu"
             aria-expanded={mobileOpen}
@@ -89,24 +96,27 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden glass border-t border-white/5 animate-slide-up">
+        <div className="md:hidden bg-charcoal-950/95 backdrop-blur-xl border-t border-white/5 animate-slide-up">
           <div className="px-4 py-4 space-y-1">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
                 onClick={(e) => handleAnchor(e, link.href)}
-                className="block px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
+                className="block px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-white/4 rounded-lg transition-colors"
               >
                 {link.label}
               </a>
             ))}
-            <div className="pt-3 border-t border-border flex flex-col gap-2">
+            <div className="pt-3 border-t border-border flex flex-col gap-2 mt-2">
               <Link to="/login">
                 <Button variant="outline" size="md" className="w-full">Log In</Button>
               </Link>
-              <Link to="/signup">
-                <Button variant="primary" size="md" className="w-full">Get Started</Button>
+              <Link to="/dashboard">
+                <Button variant="primary" size="md" className="w-full gap-1.5">
+                  Open Dashboard
+                  <ExternalLink size={12} />
+                </Button>
               </Link>
             </div>
           </div>
