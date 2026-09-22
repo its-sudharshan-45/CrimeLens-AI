@@ -17,7 +17,7 @@ import os
 import sys
 import json
 import logging
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional, Union, cast
 
 import numpy as np
 import torch
@@ -143,7 +143,7 @@ class HotspotPredictor:
                 f"Invalid number of features: expected {self.n_features}, got {f}."
             )
 
-        return arr
+        return cast(np.ndarray, arr)
 
     def scale_input(self, arr: np.ndarray) -> np.ndarray:
         """Apply feature-wise min-max normalization fit on training slice."""
