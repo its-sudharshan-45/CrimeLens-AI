@@ -157,7 +157,7 @@ def _prepare_sqlite_schema() -> None:
             if isinstance(column.type, JSONB):
                 column.type = JSON()
             if getattr(column.type, "native_enum", None) is True:
-                column.type.native_enum = False
+                setattr(column.type, "native_enum", False)
 
 
 @pytest.fixture

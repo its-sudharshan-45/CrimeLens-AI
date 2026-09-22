@@ -126,7 +126,7 @@ class InvestigationService:
             investigation.investigator_id = new_investigator_id
             if investigation.status == InvestigationStatus.OPEN:
                 investigation.status = InvestigationStatus.UNDER_INVESTIGATION
-                await self._create_timeline_event(db, investigation.id, "Status Updated", f"Status changed to UNDER_INVESTIGATION", user_id)
+                await self._create_timeline_event(db, investigation.id, "Status Updated", "Status changed to UNDER_INVESTIGATION", user_id)
 
             await repo.update(investigation, {})
             
