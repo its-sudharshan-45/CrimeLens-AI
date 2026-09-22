@@ -21,6 +21,16 @@
     "scikit",
     "torchvision",
     "torchmetrics",
-    "tensorboard"
+    "tensorboard",
+    "mypy",
+    "ehthumbs",
+    "onnx",
+    "safetensors",
+    "Gorishniy",
+    "kaiming",
+    "Multihead",
+    "NCHW",
+    "Oreshkin",
+    "freqs"
   ]
 }

@@ -1,11 +1,11 @@
 {
-  "venvPath": "backend",
+  "venvPath": ".",
   "venv": ".venv",
-  "pythonPath": "backend/.venv/Scripts/python.exe",
+  "pythonPath": ".venv/Scripts/python.exe",
   "extraPaths": [
     ".",
     "backend",
     "ai",
-    "backend/.venv/Lib/site-packages"
+    "C:/Users/Hp/AppData/Local/Programs/Python/Python313/Lib/site-packages"
   ]
 }
