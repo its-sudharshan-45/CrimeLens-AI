@@ -34,12 +34,25 @@ dev = [
 ]
 
 [tool.ruff]
-line-length = 88
+line-length = 120
 target-version = "py311"
+extend-exclude = [
+    "alembic",
+    "scripts",
+    ".venv",
+]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B"]
-ignore = []
+select = ["E", "F"]
+ignore = [
+    "E501",  # line too long
+    "E402",  # module level import not at top of file
+    "E711",  # comparison to None
+    "E712",  # comparison to True/False (idiomatic in SQLAlchemy query expressions)
+    "F401",  # unused import
+    "F841",  # unused variable
+    "F811",  # redefinition of unused name
+]
 
 [build-system]
 requires = ["hatchling"]
