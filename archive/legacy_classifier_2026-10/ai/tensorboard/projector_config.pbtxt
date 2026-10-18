@@ -1,0 +1,5 @@
+embeddings {
+  tensor_name: "CrimeEmbeddings:00000"
+  metadata_path: "00000/CrimeEmbeddings\\metadata.tsv"
+  tensor_path: "00000/CrimeEmbeddings\\tensors.tsv"
+}
