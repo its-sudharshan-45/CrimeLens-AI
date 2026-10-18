@@ -1,6 +1,6 @@
 # CrimeLens AI
 
-CrimeLens AI is a full-stack crime intelligence platform for exploring, managing, and analyzing Indian crime incident data. It combines a React dashboard, a FastAPI backend on Supabase PostgreSQL, and PyTorch models for classification, forecasting, hotspot detection, and explainability.
+CrimeLens AI is a full-stack crime intelligence platform for exploring, managing, and analyzing Indian crime incident data. It combines a React dashboard, a FastAPI backend on Supabase PostgreSQL, and a single PyTorch **GRU** model that forecasts daily crime counts.
 
 ---
 
@@ -20,19 +20,37 @@ CrimeLens AI is a full-stack crime intelligence platform for exploring, managing
 - **Security dashboard** — security-focused monitoring views
 
 ### AI & predictions
-- **Crime domain classification** — FT-Transformer + MLP ensemble (`POST /api/v1/ai/predict`)
-- **Multi-horizon forecasting** — N-BEATS 7 / 30 / 90-day trend projections (`POST /api/v1/ai/forecast`)
-- **City hotspot ranking** — CNN model ranks high-risk cities (`POST /api/v1/predict/hotspots`)
-- **Temporal risk forecast** — GRU 7-day crime volume forecast with uncertainty intervals (`POST /api/v1/predict/temporal-risk`)
-- **Investigation leads** — pattern-based investigative priorities without individual profiling (`POST /api/v1/predict/investigation-leads`)
-- **Embeddings** — 64-dimensional dense vectors for similarity analysis (`POST /api/v1/ai/embedding`)
-- **Explainability** — Captum integrated gradients and saliency attribution (`POST /api/v1/ai/explain`)
-- **Batch inference** — bulk CSV/JSON prediction (`POST /api/v1/ai/batch-predict`)
-- **Prediction history** — paginated log of past predictions from the database
+The project ships **one** working deep-learning model: a pooled PyTorch **GRU** that forecasts the
+next 7 days of daily crime counts for any supported *scope* (a city or a crime type).
+
+- **7-day crime-count forecast** — `POST /api/v1/ai/forecast` returns a genuine forward forecast,
+  the historical series, empirical 95% prediction intervals, an honest held-out backtest
+  (actual-vs-predicted), and evaluation metrics compared against a **persistence baseline**.
+- **Supported scopes** — `GET /api/v1/ai/scopes` lists all cities and crime types.
+- **Model metadata** — `GET /api/v1/ai/models` exposes the active version, dataset hash, architecture
+  and held-out metrics; `GET /api/v1/ai/health` reports load status.
+- **Prediction history** — every forecast is persisted with full lineage; browse it at
+  `GET /predict/history`, with aggregate observability at `GET /predict/stats`.
+- **City hotspot ranking (DEPRECATED)** — the Phase 4 2D-CNN was removed 2026-10-16 (the data is
+  tabular, not images); `POST /predict/hotspots` now returns **410 Gone** and historical records
+  remain queryable via `GET /predict/history`.
+
+#### Honest model-quality note (2026-10)
+
+The bundled dataset is synthetic and balanced (exactly 24 incidents/day), so city- and type-level
+daily counts are close to white noise. The GRU is therefore expected to beat the persistence
+baseline only modestly, and the reported metrics reflect that.
+
+- Metrics (MAE, RMSE, WAPE, R²) are computed on an **untouched chronological test split**
+  (train 2020-01-01→2022-12-31, validation 2023, test 2024-01-01→2024-07-30) and are **never hardcoded**.
+- Per-scope normalisation statistics are fitted on the **training window only** — no leakage.
+- If the model did not beat the baseline, the API reports that honestly rather than hiding it.
+- The dataset dates are stored as **MM-DD-YYYY**; earlier code parsed them day-first, which was a bug.
+- Retraining is reproducible: `python -m ai.forecasting.train --epochs 60` records the seed, split
+  boundaries, feature schema, dataset hash and full evaluation results.
 
 ### MLOps & observability
-- **Model registry** — versioned model metadata (`ai/registry/v1.0.0`)
-- **Model switching** — activate or roll back registered model versions
+- **Model registry** — single-version metadata in `ai/registry/forecast_v1/`, active version in `forecast_active.json`
 - **Analytics dashboard** — prediction distribution, daily trends, latency metrics
 - **Drift detection** — data drift status and reports
 - **System health** — API and AI subsystem health checks, model load status
@@ -46,7 +64,7 @@ CrimeLens AI is a full-stack crime intelligence platform for exploring, managing
 | Categories / Locations | Reference data management |
 | Investigations | Case workflow tracking |
 | Evidence | File upload and review |
-| AI Predictions | Hotspots, temporal risk, leads, live inference, forecasts, XAI |
+| AI Predictions | 7-day GRU crime-count forecasts, evaluation metrics, prediction history |
 | Analytics | MLOps metrics, drift, model versions |
 | Audit Center | Audit log search and review |
 | Security / System Health / Backups | Operations and admin tooling |
@@ -66,8 +84,8 @@ CrimeLens AI is a full-stack crime intelligence platform for exploring, managing
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS, TanStack Query, Recharts |
 | Backend | FastAPI, SQLAlchemy 2.0 (async), Pydantic v2, Alembic |
 | Database & Auth | Supabase PostgreSQL, Supabase Auth, JWT (JWKS) |
-| AI | PyTorch, scikit-learn, Captum, model registry |
-| Testing | Pytest (116 backend + 47 AI tests), Vitest, TypeScript build |
+| AI | PyTorch (GRU forecaster), NumPy, model registry |
+| Testing | Pytest (backend + AI), Vitest, TypeScript build |
 
 ---
 
@@ -75,7 +93,7 @@ CrimeLens AI is a full-stack crime intelligence platform for exploring, managing
 
 ```
 CrimeLens-AI/
-├── ai/                  # Model architectures, training, inference, registry, tests
+├── ai/                  # GRU forecaster (ai/forecasting/), registry, tests; legacy stack in archive/
 ├── backend/             # FastAPI app, services, API routes, DB models, scripts
 ├── Dataset/             # Source CSV (crime_dataset_india.csv)
 ├── frontend/            # React SPA
@@ -102,7 +120,20 @@ copy backend\.env.example backend\.env
 copy frontend\.env.example frontend\.env
 ```
 
-### 2. Backend
+### 2. Train the AI model
+
+The GRU forecaster must be trained once before the backend can serve forecasts:
+
+```powershell
+# From the repository root
+.venv\Scripts\python.exe -m ai.forecasting.train --epochs 60
+```
+
+This writes a checkpoint and honest evaluation artifacts to `ai/registry/forecast_v1/`
+(metrics, plots, scope series). If you skip this step, the forecast endpoints return a clear
+"model not loaded" response instead of fabricating numbers.
+
+### 3. Backend
 
 ```powershell
 cd backend
@@ -118,7 +149,7 @@ python -m backend.scripts.import_crime_dataset
 
 API docs: `http://127.0.0.1:8000/docs`
 
-### 3. Frontend
+### 4. Frontend
 
 ```powershell
 cd frontend
@@ -128,7 +159,7 @@ npm run dev
 
 App: `http://localhost:5173`
 
-### 4. Run tests
+### 5. Run tests
 
 ```powershell
 backend\.venv\Scripts\python.exe -m pytest backend/tests/ -q
@@ -136,7 +167,10 @@ backend\.venv\Scripts\python.exe -m pytest ai/tests/ -q
 cd frontend && npm run build && npm run test
 ```
 
-> **Note:** Trained model weights (`.pt` files) are not committed to git. Train locally with `ai/training/` or copy weights into `ai/models/` and `ai/registry/v1.0.0/` before running inference endpoints.
+> **Note:** Trained model weights (`.pt` files) are not committed to git. Regenerate them
+> reproducibly from the repository root with `python -m ai.forecasting.train --epochs 60`
+> (writes `ai/registry/forecast_v1/`) before starting the backend, or copy a
+> `gru_forecaster.pt` checkpoint into `ai/registry/forecast_v1/`.
 
 ---
 
