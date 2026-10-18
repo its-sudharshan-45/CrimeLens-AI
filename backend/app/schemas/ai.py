@@ -1,140 +1,110 @@
 """
 backend/app/schemas/ai.py
 =========================
-Pydantic Schemas for CrimeLens AI Deep Learning API Endpoints.
+Pydantic schemas for the CrimeLens AI forecasting API.
+
+Only one model is exposed: ``CrimeGRUForecaster`` (7-day crime-count forecast per
+scope).  The previous classification / N-BEATS / embedding schemas were removed
+with their endpoints.
 """
 
-from pydantic import BaseModel, Field, ConfigDict
-from typing import Dict, List, Optional, Any
-import uuid
 from datetime import datetime, timezone
+from typing import Any, Dict, List, Literal, Optional
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
-class CrimePredictionRequest(BaseModel):
-    """Payload for real-time crime domain classification."""
-    city: str = Field(..., description="City name")
-    crime_description: str = Field(..., description="Crime description code")
-    victim_age: int = Field(..., ge=0, le=120, description="Victim age")
-    victim_gender: str = Field(..., description="Victim gender M/F")
-    weapon_used: Optional[str] = Field(default="Unknown", description="Weapon used")
-    date_of_occurrence: str = Field(..., description="Date of occurrence dd-mm-yyyy HH:MM")
-    time_of_occurrence: str = Field(..., description="Time of occurrence dd-mm-yyyy HH:MM")
-    date_reported: Optional[str] = Field(default=None, description="Date reported dd-mm-yyyy HH:MM")
-    case_closed: Optional[str] = Field(default="No", description="Whether case is closed")
-    crime_code: Optional[int] = Field(default=100, description="Crime code number")
+class ScopeInfo(BaseModel):
+    """A selectable forecasting scope (a city or a crime type)."""
 
-    model_config = ConfigDict(from_attributes=True)
+    key: str = Field(..., description="Stored scope key, e.g. 'city:Delhi'")
+    scope_type: Literal["city", "crime_type"]
+    display_name: str
 
 
-class CrimePredictionResponse(BaseModel):
-    """Response payload for crime domain classification."""
-    prediction_id: Optional[str] = Field(default=None, description="Prediction UUID")
-    predicted_domain: str = Field(..., description="Predicted crime domain")
-    domain_code: int = Field(..., description="Domain class index")
-    confidence_score: float = Field(..., description="Top-1 confidence score")
-    probabilities: Dict[str, float] = Field(..., description="Per-class probabilities")
-    model_name: str = Field(..., description="Model class name")
-    model_version: str = Field(..., description="Model version string")
-    execution_time_ms: int = Field(..., description="Inference latency in ms")
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    model_config = ConfigDict(from_attributes=True)
+class ScopeListResponse(BaseModel):
+    scopes: List[ScopeInfo]
+    count: int
 
 
 class ForecastRequest(BaseModel):
-    """Payload for multi-horizon sequence forecasting."""
-    horizon: int = Field(default=7, description="Forecast horizon in days (7, 30, or 90)")
-    recent_sequence: Optional[List[float]] = Field(default=None, description="Optional 30-day historical daily counts")
+    """Request a 7-day forecast for a supported scope."""
 
-    model_config = ConfigDict(from_attributes=True)
+    scope_type: Literal["city", "crime_type"] = Field(..., description="'city' or 'crime_type'")
+    scope_value: str = Field(..., min_length=1, description="City name or crime description, e.g. 'Delhi' or 'BURGLARY'")
+
+    model_config = ConfigDict(
+        json_schema_extra={"example": {"scope_type": "city", "scope_value": "Delhi"}}
+    )
+
+
+class HistoricalPoint(BaseModel):
+    date: str
+    count: float
+
+
+class ForecastDay(BaseModel):
+    day: int = Field(..., ge=1, description="Forecast step (1 = next day)")
+    date: str = Field(..., description="Calendar date of the forecast")
+    predicted_count: float = Field(..., ge=0.0, description="Model-predicted daily crime count")
+    lower_bound_95: float = Field(..., ge=0.0)
+    upper_bound_95: float = Field(..., ge=0.0)
+
+
+class ActualVsPredictedPoint(BaseModel):
+    date: str
+    actual: float
+    predicted: float
 
 
 class ForecastResponse(BaseModel):
-    """Response payload for time series forecasting."""
-    horizon: int = Field(..., description="Forecast horizon in days")
-    forecast_dates: List[str] = Field(..., description="ISO date strings for forecast window")
-    predicted_counts: List[float] = Field(..., description="Predicted daily crime counts")
-    total_projected_incidents: float = Field(..., description="Sum of predicted counts")
-    model_name: str = Field(..., description="Forecaster model class name")
-    model_version: str = Field(..., description="Model version string")
-    execution_time_ms: int = Field(..., description="Inference latency in ms")
+    """Full forecast payload: history, seven forecast values, backtest and metrics."""
 
-    model_config = ConfigDict(from_attributes=True)
-
-
-class EmbeddingRequest(BaseModel):
-    """Payload for dense vector embedding generation."""
-    sample_record: CrimePredictionRequest
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class EmbeddingResponse(BaseModel):
-    """Response payload for 64-dimensional dense embeddings."""
-    embedding_vector: List[float] = Field(..., description="Dense embedding vector")
-    embedding_dim: int = Field(default=64, description="Embedding dimension")
-    l2_norm: float = Field(default=1.0, description="L2 norm of the embedding")
-    model_name: str = Field(default="CrimeEmbeddingNetwork", description="Embedding model name")
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class FeatureAttribution(BaseModel):
-    feature_name: str
-    attribution_score: float
-
-
-class ExplainabilityRequest(BaseModel):
-    """Payload for Captum XAI feature attribution."""
-    sample_record: CrimePredictionRequest
-    target_class: Optional[int] = Field(default=0, description="Target class index for attribution")
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class ExplainabilityResponse(BaseModel):
-    """Response payload for feature attribution & sensitivity."""
-    predicted_domain: str
-    confidence_score: float
-    top_contributing_features: List[FeatureAttribution]
-    saliency_scores: List[FeatureAttribution]
-    model_name: str = Field(default="FTTransformerClassifier")
-    method: str = Field(default="Captum Integrated Gradients & Saliency")
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class BatchPredictionRequest(BaseModel):
-    """Payload for bulk batch inference."""
-    records: List[CrimePredictionRequest]
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class BatchPredictionResponse(BaseModel):
-    """Response payload for bulk batch inference."""
-    total_records: int
-    predictions: List[CrimePredictionResponse]
-    batch_execution_time_ms: int
-
-    model_config = ConfigDict(from_attributes=True)
+    success: bool = True
+    scope_key: str
+    scope_type: str
+    scope_display_name: str
+    model_name: str = "CrimeGRUForecaster"
+    model_version: str
+    sequence_length: int
+    forecast_horizon_days: int
+    last_observed_date: str
+    historical: List[HistoricalPoint]
+    forecast: List[ForecastDay]
+    actual_vs_predicted: List[ActualVsPredictedPoint] = Field(default_factory=list)
+    scope_test_metrics: Dict[str, Any] = Field(default_factory=dict)
+    test_metrics: Dict[str, Any] = Field(default_factory=dict)
+    per_horizon_metrics: Dict[str, Any] = Field(default_factory=dict)
+    evaluation_summary: Dict[str, Any] = Field(default_factory=dict)
+    uncertainty_method: Optional[str] = None
+    disclaimer: str
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class ModelHealthResponse(BaseModel):
-    """AI Subsystem health probe response."""
-    status: str = Field(default="ok", description="Health status string")
-    device: str = Field(..., description="Torch device (cpu or cuda)")
-    models_loaded: Dict[str, bool] = Field(..., description="Map of model names to load status")
-    warmup_complete: bool = Field(default=True)
+    status: str
+    model_name: str = "CrimeGRUForecaster"
+    loaded: bool
+    device: str = "cpu"
+    registry_dir: Optional[str] = None
+    n_scopes: int = 0
+    error: Optional[str] = None
 
 
 class ModelMetadataResponse(BaseModel):
-    """Metadata response for model version management."""
-    version: str = Field(..., description="Model version string")
-    framework: str = Field(..., description="Framework version string")
-    flagship_model: str = Field(..., description="Primary classifier model name")
-    forecaster_model: str = Field(..., description="Forecaster model name")
-    embedding_dim: int = Field(default=64, description="Embedding dimension")
-    dataset_rows: int = Field(default=40160, description="Training dataset row count")
-    dataset_hash_md5: str = Field(..., description="MD5 hash of dataset file")
+    version: str
+    primary_model: str = "CrimeGRUForecaster"
+    framework: Optional[str] = None
+    device: Optional[str] = None
+    seed: Optional[int] = None
+    seq_len: Optional[int] = None
+    forecast_horizon: Optional[int] = None
+    n_features: Optional[int] = None
+    n_scopes: Optional[int] = None
+    dataset_rows: Optional[int] = None
+    dataset_hash_md5: Optional[str] = None
+    test_mae: Optional[float] = None
+    test_rmse: Optional[float] = None
+    test_wape: Optional[float] = None
+    persistence_mae: Optional[float] = None
     saved_at: Optional[str] = None

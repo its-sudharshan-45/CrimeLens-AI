@@ -15,14 +15,17 @@ import numpy as np
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai.model_loader import DEFAULT_MODELS_DIR, PROJECT_ROOT
+from app.core.paths import forecast_registry_dir
 from app.models.prediction import Prediction
 
 logger = logging.getLogger("crimelens.mlops")
 
 DriftLevel = Literal["LOW", "MEDIUM", "HIGH"]
 
-TRAINING_STATS_PATH = os.path.join(DEFAULT_MODELS_DIR, "training_statistics.json")
+# Reference statistics are optional. With the single-model simplification the
+# legacy classifier statistics are archived, so drift falls back to LOW unless a
+# reference file is provided.
+TRAINING_STATS_PATH = str(forecast_registry_dir() / "training_statistics.json")
 
 PSI_LOW = 0.1
 PSI_MEDIUM = 0.25
@@ -69,14 +72,11 @@ class DriftDetector:
 
     def _load_baseline(self) -> dict[str, Any]:
         path = self.training_stats_path
-        if not os.path.isfile(path):
-            alt = os.path.join(PROJECT_ROOT, "ai", "registry", "v1.0.0", "training_statistics.json")
-            path = alt if os.path.isfile(alt) else path
-        if not os.path.isfile(path):
-            logger.warning("Training statistics file not found at %s", self.training_stats_path)
-            return {}
-        with open(path, encoding="utf-8") as handle:
-            return json.load(handle)
+        if os.path.isfile(path):
+            with open(path, encoding="utf-8") as handle:
+                return json.load(handle)
+        logger.info("No drift reference statistics found; drift will report LOW.")
+        return {}
 
     async def _recent_predictions(self, db: AsyncSession, limit: int = 500) -> list[Prediction]:
         stmt = (

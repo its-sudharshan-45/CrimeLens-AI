@@ -13,9 +13,10 @@ from typing import Any, Optional
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai.model_loader import ModelLoader, PROJECT_ROOT
+from app.core.paths import PROJECT_ROOT, forecast_registry_dir, read_active_forecast_version
 from app.core.config import settings
 from app.mlops.model_manager import ModelVersionManager
+from app.ai.forecast_service import get_forecast_service
 
 logger = logging.getLogger("crimelens.mlops")
 
@@ -36,42 +37,26 @@ class DeploymentValidator:
         self.model_manager = ModelVersionManager()
 
     def validate_registry(self) -> tuple[bool, str]:
-        index_path = self.model_manager.registry_index_path
-        active_path = self.model_manager.active_version_path
-        if not os.path.isfile(index_path):
-            return False, f"Registry index missing: {index_path}"
-        if not os.path.isfile(active_path):
-            return False, f"Active version file missing: {active_path}"
-        return True, "ok"
+        version = read_active_forecast_version()
+        registry_dir = forecast_registry_dir(version)
+        if not registry_dir.is_dir():
+            return False, f"Forecast registry directory missing: {registry_dir}"
+        return True, f"active forecast version: {version}"
 
     def validate_models(self) -> tuple[bool, list[str]]:
-        ok, errors = self.model_manager.validate_model_artifacts(
-            self.model_manager.default_models_dir
-        )
+        ok, errors = self.model_manager.validate_model_artifacts(forecast_registry_dir())
         return ok, errors
 
     def validate_preprocessor_artifacts(self) -> tuple[bool, list[str]]:
+        """Validate the forecast feature-schema artifact (fitted at training time)."""
         errors: list[str] = []
-        models_dir = self.model_manager.default_models_dir
-        prep = os.path.join(models_dir, "preprocessor.pkl")
-        features = os.path.join(models_dir, "feature_columns.json")
-        label_encoder_ok = False
-        if not os.path.isfile(prep):
-            errors.append("preprocessor.pkl missing")
-        else:
-            try:
-                import joblib
-
-                artifact = joblib.load(prep)
-                label_encoder_ok = hasattr(artifact, "label_encoders") and bool(
-                    artifact.label_encoders
-                )
-                if not label_encoder_ok:
-                    errors.append("label encoder missing inside preprocessor")
-            except Exception as exc:  # noqa: BLE001
-                errors.append(f"preprocessor load failed: {exc}")
-        if not os.path.isfile(features):
+        models_dir = forecast_registry_dir()
+        features = models_dir / "feature_columns.json"
+        scope_series = models_dir / "scope_series.json"
+        if not features.is_file():
             errors.append("feature_columns.json missing")
+        if not scope_series.is_file():
+            errors.append("scope_series.json missing")
         return len(errors) == 0, errors
 
     async def validate_database(self, db: Optional[AsyncSession] = None) -> tuple[bool, str]:
@@ -128,14 +113,15 @@ class DeploymentValidator:
             result.errors.append(f"supabase: {supabase_msg}")
             result.ok = False
 
-        loader = ModelLoader.get_instance()
+        service = get_forecast_service()
+        service.load()
         result.checks["model_loader"] = {
-            "ok": loader.is_loaded,
-            "models_dir": loader.models_dir,
-            "feature_columns": len(loader.feature_columns),
+            "ok": service.is_loaded,
+            "registry_dir": str(service.registry_dir),
+            "n_scopes": len(service.available_scopes()),
         }
-        if not loader.is_loaded:
-            result.errors.append("ModelLoader did not finish loading models")
+        if not service.is_loaded:
+            result.errors.append(service.load_error or "GRU forecaster did not load")
             result.ok = False
 
         if result.ok:
@@ -177,7 +163,8 @@ class SystemMonitor:
         models_ok, model_errors = validator.validate_models()
         db_ok, db_msg = await validator.validate_database(db)
         supabase_ok, supabase_msg = validator.validate_supabase()
-        loader = ModelLoader.get_instance()
+        service = get_forecast_service()
+        service.load()
 
         return {
             "api_status": "ok",
@@ -185,7 +172,7 @@ class SystemMonitor:
             "database_detail": db_msg,
             "supabase_status": "ok" if supabase_ok else "error",
             "supabase_detail": supabase_msg,
-            "model_status": "loaded" if loader.is_loaded else "not_loaded",
+            "model_status": "loaded" if service.is_loaded else "not_loaded",
             "model_errors": model_errors,
             "registry_status": "ok" if registry_ok else "error",
             "registry_detail": registry_msg,
@@ -193,5 +180,5 @@ class SystemMonitor:
             "memory_usage_mb": self.memory_usage_mb(),
             "cpu_usage_percent": self.cpu_usage_percent(),
             "uptime_seconds": self.uptime_seconds(),
-            "project_root": PROJECT_ROOT,
+            "project_root": str(PROJECT_ROOT),
         }
