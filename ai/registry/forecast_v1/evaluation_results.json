@@ -1,0 +1,565 @@
+{
+  "model_name": "CrimeGRUForecaster",
+  "model_version": "forecast_v1",
+  "evaluation_date": "2026-10-17T22:34:34",
+  "dataset_path": "D:\\CrimeLens-AI\\Dataset\\crime_dataset_india.csv",
+  "dataset_hash_md5": "9bb143539b74ecef9274f167603bb490",
+  "splits": {
+    "train": [
+      "2020-01-01",
+      "2022-12-31"
+    ],
+    "val": [
+      "2023-01-01",
+      "2023-12-31"
+    ],
+    "test": [
+      "2024-01-01",
+      "2024-07-30"
+    ]
+  },
+  "seq_len": 30,
+  "forecast_horizon": 7,
+  "n_scopes": 50,
+  "test_windows": 10300,
+  "metrics": {
+    "model": {
+      "MAE": 0.6933,
+      "RMSE": 0.9656,
+      "WAPE": 0.7221,
+      "sMAPE": 1.1835,
+      "R2": 0.2713,
+      "n_observations": 72100
+    },
+    "persistence_baseline": {
+      "MAE": 0.9345,
+      "RMSE": 1.3536,
+      "WAPE": 0.9734,
+      "sMAPE": 1.0971,
+      "R2": -0.4321,
+      "n_observations": 72100
+    },
+    "model_beats_baseline_MAE": true
+  },
+  "per_horizon": {
+    "model": {
+      "Day +1": {
+        "MAE": 0.6927,
+        "RMSE": 0.966,
+        "WAPE": 0.7216,
+        "sMAPE": 1.1851,
+        "R2": 0.2713,
+        "n_observations": 10300
+      },
+      "Day +2": {
+        "MAE": 0.6933,
+        "RMSE": 0.9656,
+        "WAPE": 0.7222,
+        "sMAPE": 1.1834,
+        "R2": 0.2725,
+        "n_observations": 10300
+      },
+      "Day +3": {
+        "MAE": 0.6926,
+        "RMSE": 0.9645,
+        "WAPE": 0.7215,
+        "sMAPE": 1.1828,
+        "R2": 0.272,
+        "n_observations": 10300
+      },
+      "Day +4": {
+        "MAE": 0.6934,
+        "RMSE": 0.9651,
+        "WAPE": 0.7223,
+        "sMAPE": 1.1826,
+        "R2": 0.2725,
+        "n_observations": 10300
+      },
+      "Day +5": {
+        "MAE": 0.6936,
+        "RMSE": 0.9659,
+        "WAPE": 0.7225,
+        "sMAPE": 1.1838,
+        "R2": 0.27,
+        "n_observations": 10300
+      },
+      "Day +6": {
+        "MAE": 0.6935,
+        "RMSE": 0.9661,
+        "WAPE": 0.7224,
+        "sMAPE": 1.1839,
+        "R2": 0.2695,
+        "n_observations": 10300
+      },
+      "Day +7": {
+        "MAE": 0.6937,
+        "RMSE": 0.966,
+        "WAPE": 0.7227,
+        "sMAPE": 1.1831,
+        "R2": 0.2709,
+        "n_observations": 10300
+      }
+    },
+    "persistence_baseline": {
+      "Day +1": {
+        "MAE": 0.9198,
+        "RMSE": 1.3333,
+        "WAPE": 0.9581,
+        "sMAPE": 1.088,
+        "R2": -0.3882,
+        "n_observations": 10300
+      },
+      "Day +2": {
+        "MAE": 0.9371,
+        "RMSE": 1.353,
+        "WAPE": 0.9761,
+        "sMAPE": 1.1073,
+        "R2": -0.4282,
+        "n_observations": 10300
+      },
+      "Day +3": {
+        "MAE": 0.9377,
+        "RMSE": 1.3577,
+        "WAPE": 0.9767,
+        "sMAPE": 1.102,
+        "R2": -0.4423,
+        "n_observations": 10300
+      },
+      "Day +4": {
+        "MAE": 0.939,
+        "RMSE": 1.3701,
+        "WAPE": 0.9782,
+        "sMAPE": 1.0883,
+        "R2": -0.4661,
+        "n_observations": 10300
+      },
+      "Day +5": {
+        "MAE": 0.9282,
+        "RMSE": 1.3481,
+        "WAPE": 0.9668,
+        "sMAPE": 1.0871,
+        "R2": -0.422,
+        "n_observations": 10300
+      },
+      "Day +6": {
+        "MAE": 0.9332,
+        "RMSE": 1.3512,
+        "WAPE": 0.9721,
+        "sMAPE": 1.0942,
+        "R2": -0.4291,
+        "n_observations": 10300
+      },
+      "Day +7": {
+        "MAE": 0.9464,
+        "RMSE": 1.3617,
+        "WAPE": 0.9858,
+        "sMAPE": 1.1124,
+        "R2": -0.4488,
+        "n_observations": 10300
+      }
+    }
+  },
+  "per_scope": {
+    "city:Agra": {
+      "MAE": 0.557,
+      "RMSE": 0.6852,
+      "WAPE": 1.1641,
+      "sMAPE": 1.6172,
+      "R2": -0.0293,
+      "n_observations": 1442
+    },
+    "city:Ahmedabad": {
+      "MAE": 0.6537,
+      "RMSE": 0.8927,
+      "WAPE": 0.6343,
+      "sMAPE": 0.833,
+      "R2": -0.0075,
+      "n_observations": 1442
+    },
+    "city:Bangalore": {
+      "MAE": 1.0557,
+      "RMSE": 1.3859,
+      "WAPE": 0.4991,
+      "sMAPE": 0.5829,
+      "R2": -0.0142,
+      "n_observations": 1442
+    },
+    "city:Bhopal": {
+      "MAE": 0.5328,
+      "RMSE": 0.6819,
+      "WAPE": 1.1695,
+      "sMAPE": 1.6814,
+      "R2": -0.0515,
+      "n_observations": 1442
+    },
+    "city:Chennai": {
+      "MAE": 0.9537,
+      "RMSE": 1.1726,
+      "WAPE": 0.7031,
+      "sMAPE": 0.8467,
+      "R2": 0.0,
+      "n_observations": 1442
+    },
+    "city:Delhi": {
+      "MAE": 1.3812,
+      "RMSE": 1.8179,
+      "WAPE": 0.4064,
+      "sMAPE": 0.4506,
+      "R2": -0.0396,
+      "n_observations": 1442
+    },
+    "city:Faridabad": {
+      "MAE": 0.3265,
+      "RMSE": 0.5114,
+      "WAPE": 1.3453,
+      "sMAPE": 1.9029,
+      "R2": -0.0387,
+      "n_observations": 1442
+    },
+    "city:Ghaziabad": {
+      "MAE": 0.511,
+      "RMSE": 0.6293,
+      "WAPE": 1.335,
+      "sMAPE": 1.7325,
+      "R2": -0.0077,
+      "n_observations": 1442
+    },
+    "city:Hyderabad": {
+      "MAE": 0.9589,
+      "RMSE": 1.1844,
+      "WAPE": 0.6229,
+      "sMAPE": 0.7383,
+      "R2": -0.0003,
+      "n_observations": 1442
+    },
+    "city:Indore": {
+      "MAE": 0.5103,
+      "RMSE": 0.5913,
+      "WAPE": 1.1908,
+      "sMAPE": 1.6346,
+      "R2": -0.0225,
+      "n_observations": 1442
+    },
+    "city:Jaipur": {
+      "MAE": 0.7605,
+      "RMSE": 0.9485,
+      "WAPE": 0.8501,
+      "sMAPE": 1.1463,
+      "R2": -0.0168,
+      "n_observations": 1442
+    },
+    "city:Kalyan": {
+      "MAE": 0.2886,
+      "RMSE": 0.424,
+      "WAPE": 1.5703,
+      "sMAPE": 1.9111,
+      "R2": -0.0035,
+      "n_observations": 1442
+    },
+    "city:Kanpur": {
+      "MAE": 0.6419,
+      "RMSE": 0.7488,
+      "WAPE": 0.9846,
+      "sMAPE": 1.3461,
+      "R2": -0.0167,
+      "n_observations": 1442
+    },
+    "city:Kolkata": {
+      "MAE": 1.0222,
+      "RMSE": 1.2639,
+      "WAPE": 0.6572,
+      "sMAPE": 0.8131,
+      "R2": -0.0283,
+      "n_observations": 1442
+    },
+    "city:Lucknow": {
+      "MAE": 0.6701,
+      "RMSE": 0.819,
+      "WAPE": 0.8536,
+      "sMAPE": 1.1421,
+      "R2": -0.0062,
+      "n_observations": 1442
+    },
+    "city:Ludhiana": {
+      "MAE": 0.545,
+      "RMSE": 0.6687,
+      "WAPE": 1.2203,
+      "sMAPE": 1.659,
+      "R2": -0.0196,
+      "n_observations": 1442
+    },
+    "city:Meerut": {
+      "MAE": 0.3632,
+      "RMSE": 0.5452,
+      "WAPE": 1.2774,
+      "sMAPE": 1.8714,
+      "R2": -0.0572,
+      "n_observations": 1442
+    },
+    "city:Mumbai": {
+      "MAE": 1.1891,
+      "RMSE": 1.5016,
+      "WAPE": 0.4673,
+      "sMAPE": 0.5354,
+      "R2": -0.0118,
+      "n_observations": 1442
+    },
+    "city:Nagpur": {
+      "MAE": 0.6625,
+      "RMSE": 0.7968,
+      "WAPE": 1.1044,
+      "sMAPE": 1.4755,
+      "R2": -0.0103,
+      "n_observations": 1442
+    },
+    "city:Nashik": {
+      "MAE": 0.3178,
+      "RMSE": 0.4976,
+      "WAPE": 1.4143,
+      "sMAPE": 1.9084,
+      "R2": -0.0226,
+      "n_observations": 1442
+    },
+    "city:Patna": {
+      "MAE": 0.565,
+      "RMSE": 0.6998,
+      "WAPE": 1.0979,
+      "sMAPE": 1.6225,
+      "R2": -0.0796,
+      "n_observations": 1442
+    },
+    "city:Pune": {
+      "MAE": 0.9191,
+      "RMSE": 1.238,
+      "WAPE": 0.6357,
+      "sMAPE": 0.7984,
+      "R2": -0.0675,
+      "n_observations": 1442
+    },
+    "city:Rajkot": {
+      "MAE": 0.3013,
+      "RMSE": 0.5041,
+      "WAPE": 1.3288,
+      "sMAPE": 1.9187,
+      "R2": -0.0443,
+      "n_observations": 1442
+    },
+    "city:Srinagar": {
+      "MAE": 0.304,
+      "RMSE": 0.432,
+      "WAPE": 1.4613,
+      "sMAPE": 1.8937,
+      "R2": -0.0132,
+      "n_observations": 1442
+    },
+    "city:Surat": {
+      "MAE": 0.6628,
+      "RMSE": 0.7775,
+      "WAPE": 0.9587,
+      "sMAPE": 1.346,
+      "R2": -0.0383,
+      "n_observations": 1442
+    },
+    "city:Thane": {
+      "MAE": 0.5214,
+      "RMSE": 0.6524,
+      "WAPE": 1.2572,
+      "sMAPE": 1.6895,
+      "R2": -0.0162,
+      "n_observations": 1442
+    },
+    "city:Varanasi": {
+      "MAE": 0.3122,
+      "RMSE": 0.4692,
+      "WAPE": 1.4571,
+      "sMAPE": 1.9025,
+      "R2": -0.0149,
+      "n_observations": 1442
+    },
+    "city:Vasai": {
+      "MAE": 0.2705,
+      "RMSE": 0.3935,
+      "WAPE": 1.6739,
+      "sMAPE": 1.9202,
+      "R2": 0.0001,
+      "n_observations": 1442
+    },
+    "city:Visakhapatnam": {
+      "MAE": 0.5792,
+      "RMSE": 0.7293,
+      "WAPE": 1.1062,
+      "sMAPE": 1.6175,
+      "R2": -0.0688,
+      "n_observations": 1442
+    },
+    "crime_type:ARSON": {
+      "MAE": 0.725,
+      "RMSE": 0.989,
+      "WAPE": 0.6526,
+      "sMAPE": 0.856,
+      "R2": -0.016,
+      "n_observations": 1442
+    },
+    "crime_type:ASSAULT": {
+      "MAE": 0.7801,
+      "RMSE": 1.0483,
+      "WAPE": 0.7129,
+      "sMAPE": 0.9328,
+      "R2": -0.0111,
+      "n_observations": 1442
+    },
+    "crime_type:BURGLARY": {
+      "MAE": 0.8422,
+      "RMSE": 1.1244,
+      "WAPE": 0.6633,
+      "sMAPE": 0.8739,
+      "R2": -0.0538,
+      "n_observations": 1442
+    },
+    "crime_type:COUNTERFEITING": {
+      "MAE": 0.8182,
+      "RMSE": 1.0719,
+      "WAPE": 0.6588,
+      "sMAPE": 0.8823,
+      "R2": -0.0755,
+      "n_observations": 1442
+    },
+    "crime_type:CYBERCRIME": {
+      "MAE": 0.7854,
+      "RMSE": 1.1226,
+      "WAPE": 0.6835,
+      "sMAPE": 0.8893,
+      "R2": -0.0226,
+      "n_observations": 1442
+    },
+    "crime_type:DOMESTIC VIOLENCE": {
+      "MAE": 0.8283,
+      "RMSE": 1.1147,
+      "WAPE": 0.7536,
+      "sMAPE": 0.9619,
+      "R2": -0.0027,
+      "n_observations": 1442
+    },
+    "crime_type:DRUG OFFENSE": {
+      "MAE": 0.7423,
+      "RMSE": 0.976,
+      "WAPE": 0.757,
+      "sMAPE": 0.9774,
+      "R2": -0.0,
+      "n_observations": 1442
+    },
+    "crime_type:EXTORTION": {
+      "MAE": 0.7441,
+      "RMSE": 1.0143,
+      "WAPE": 0.6648,
+      "sMAPE": 0.8793,
+      "R2": -0.0278,
+      "n_observations": 1442
+    },
+    "crime_type:FIREARM OFFENSE": {
+      "MAE": 0.8611,
+      "RMSE": 1.1579,
+      "WAPE": 0.7124,
+      "sMAPE": 0.9343,
+      "R2": -0.0272,
+      "n_observations": 1442
+    },
+    "crime_type:FRAUD": {
+      "MAE": 0.876,
+      "RMSE": 1.148,
+      "WAPE": 0.7426,
+      "sMAPE": 0.9697,
+      "R2": -0.0171,
+      "n_observations": 1442
+    },
+    "crime_type:HOMICIDE": {
+      "MAE": 0.7871,
+      "RMSE": 1.0899,
+      "WAPE": 0.6708,
+      "sMAPE": 0.8659,
+      "R2": -0.0204,
+      "n_observations": 1442
+    },
+    "crime_type:IDENTITY THEFT": {
+      "MAE": 0.732,
+      "RMSE": 0.9577,
+      "WAPE": 0.7028,
+      "sMAPE": 0.9213,
+      "R2": -0.0024,
+      "n_observations": 1442
+    },
+    "crime_type:ILLEGAL POSSESSION": {
+      "MAE": 0.7488,
+      "RMSE": 1.0703,
+      "WAPE": 0.6245,
+      "sMAPE": 0.8114,
+      "R2": -0.0455,
+      "n_observations": 1442
+    },
+    "crime_type:KIDNAPPING": {
+      "MAE": 0.7837,
+      "RMSE": 1.1088,
+      "WAPE": 0.6993,
+      "sMAPE": 0.8949,
+      "R2": -0.0091,
+      "n_observations": 1442
+    },
+    "crime_type:PUBLIC INTOXICATION": {
+      "MAE": 0.7967,
+      "RMSE": 1.1311,
+      "WAPE": 0.6766,
+      "sMAPE": 0.8836,
+      "R2": -0.0291,
+      "n_observations": 1442
+    },
+    "crime_type:ROBBERY": {
+      "MAE": 0.6876,
+      "RMSE": 0.9583,
+      "WAPE": 0.5966,
+      "sMAPE": 0.7737,
+      "R2": -0.0215,
+      "n_observations": 1442
+    },
+    "crime_type:SEXUAL ASSAULT": {
+      "MAE": 0.7967,
+      "RMSE": 1.0649,
+      "WAPE": 0.6786,
+      "sMAPE": 0.8911,
+      "R2": -0.025,
+      "n_observations": 1442
+    },
+    "crime_type:SHOPLIFTING": {
+      "MAE": 0.7055,
+      "RMSE": 0.9725,
+      "WAPE": 0.6464,
+      "sMAPE": 0.8469,
+      "R2": -0.0117,
+      "n_observations": 1442
+    },
+    "crime_type:TRAFFIC VIOLATION": {
+      "MAE": 0.7944,
+      "RMSE": 1.13,
+      "WAPE": 0.6311,
+      "sMAPE": 0.8211,
+      "R2": -0.0653,
+      "n_observations": 1442
+    },
+    "crime_type:VANDALISM": {
+      "MAE": 0.7878,
+      "RMSE": 1.0297,
+      "WAPE": 0.7324,
+      "sMAPE": 0.9231,
+      "R2": -0.0002,
+      "n_observations": 1442
+    },
+    "crime_type:VEHICLE - STOLEN": {
+      "MAE": 0.7027,
+      "RMSE": 0.9792,
+      "WAPE": 0.6496,
+      "sMAPE": 0.8487,
+      "R2": -0.018,
+      "n_observations": 1442
+    }
+  },
+  "honest_note": "The dataset is synthetic and balanced; city/type daily counts show no measurable autocorrelation, so the GRU is expected to perform close to the persistence baseline. Metrics are computed on the untouched test split."
+}

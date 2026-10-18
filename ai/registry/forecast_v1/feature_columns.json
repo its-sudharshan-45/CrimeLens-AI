@@ -1,0 +1,11 @@
+{
+  "feature_columns": [
+    "count_z",
+    "sin_weekday",
+    "cos_weekday",
+    "is_weekend",
+    "sin_month",
+    "cos_month"
+  ],
+  "n_features": 6
+}

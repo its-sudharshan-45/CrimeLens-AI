@@ -1,0 +1,139 @@
+{
+  "test": {
+    "model": {
+      "MAE": 0.6933,
+      "RMSE": 0.9656,
+      "WAPE": 0.7221,
+      "sMAPE": 1.1835,
+      "R2": 0.2713,
+      "n_observations": 72100
+    },
+    "persistence_baseline": {
+      "MAE": 0.9345,
+      "RMSE": 1.3536,
+      "WAPE": 0.9734,
+      "sMAPE": 1.0971,
+      "R2": -0.4321,
+      "n_observations": 72100
+    },
+    "model_beats_baseline_MAE": true
+  },
+  "per_horizon": {
+    "model": {
+      "Day +1": {
+        "MAE": 0.6927,
+        "RMSE": 0.966,
+        "WAPE": 0.7216,
+        "sMAPE": 1.1851,
+        "R2": 0.2713,
+        "n_observations": 10300
+      },
+      "Day +2": {
+        "MAE": 0.6933,
+        "RMSE": 0.9656,
+        "WAPE": 0.7222,
+        "sMAPE": 1.1834,
+        "R2": 0.2725,
+        "n_observations": 10300
+      },
+      "Day +3": {
+        "MAE": 0.6926,
+        "RMSE": 0.9645,
+        "WAPE": 0.7215,
+        "sMAPE": 1.1828,
+        "R2": 0.272,
+        "n_observations": 10300
+      },
+      "Day +4": {
+        "MAE": 0.6934,
+        "RMSE": 0.9651,
+        "WAPE": 0.7223,
+        "sMAPE": 1.1826,
+        "R2": 0.2725,
+        "n_observations": 10300
+      },
+      "Day +5": {
+        "MAE": 0.6936,
+        "RMSE": 0.9659,
+        "WAPE": 0.7225,
+        "sMAPE": 1.1838,
+        "R2": 0.27,
+        "n_observations": 10300
+      },
+      "Day +6": {
+        "MAE": 0.6935,
+        "RMSE": 0.9661,
+        "WAPE": 0.7224,
+        "sMAPE": 1.1839,
+        "R2": 0.2695,
+        "n_observations": 10300
+      },
+      "Day +7": {
+        "MAE": 0.6937,
+        "RMSE": 0.966,
+        "WAPE": 0.7227,
+        "sMAPE": 1.1831,
+        "R2": 0.2709,
+        "n_observations": 10300
+      }
+    },
+    "persistence_baseline": {
+      "Day +1": {
+        "MAE": 0.9198,
+        "RMSE": 1.3333,
+        "WAPE": 0.9581,
+        "sMAPE": 1.088,
+        "R2": -0.3882,
+        "n_observations": 10300
+      },
+      "Day +2": {
+        "MAE": 0.9371,
+        "RMSE": 1.353,
+        "WAPE": 0.9761,
+        "sMAPE": 1.1073,
+        "R2": -0.4282,
+        "n_observations": 10300
+      },
+      "Day +3": {
+        "MAE": 0.9377,
+        "RMSE": 1.3577,
+        "WAPE": 0.9767,
+        "sMAPE": 1.102,
+        "R2": -0.4423,
+        "n_observations": 10300
+      },
+      "Day +4": {
+        "MAE": 0.939,
+        "RMSE": 1.3701,
+        "WAPE": 0.9782,
+        "sMAPE": 1.0883,
+        "R2": -0.4661,
+        "n_observations": 10300
+      },
+      "Day +5": {
+        "MAE": 0.9282,
+        "RMSE": 1.3481,
+        "WAPE": 0.9668,
+        "sMAPE": 1.0871,
+        "R2": -0.422,
+        "n_observations": 10300
+      },
+      "Day +6": {
+        "MAE": 0.9332,
+        "RMSE": 1.3512,
+        "WAPE": 0.9721,
+        "sMAPE": 1.0942,
+        "R2": -0.4291,
+        "n_observations": 10300
+      },
+      "Day +7": {
+        "MAE": 0.9464,
+        "RMSE": 1.3617,
+        "WAPE": 0.9858,
+        "sMAPE": 1.1124,
+        "R2": -0.4488,
+        "n_observations": 10300
+      }
+    }
+  }
+}

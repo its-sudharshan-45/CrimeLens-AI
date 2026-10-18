@@ -1,0 +1,22 @@
+{
+  "version": "forecast_v1",
+  "primary_model": "CrimeGRUForecaster",
+  "framework": "PyTorch 2.14.0+cpu",
+  "python": "3.13.7",
+  "device": "cpu",
+  "seed": 42,
+  "seq_len": 30,
+  "forecast_horizon": 7,
+  "n_features": 6,
+  "n_scopes": 50,
+  "dataset_rows": 40152,
+  "dataset_hash_md5": "9bb143539b74ecef9274f167603bb490",
+  "best_epoch": 12,
+  "best_val_loss": 0.4038478053977563,
+  "training_time_sec": 1069.92,
+  "test_mae": 0.6933,
+  "test_rmse": 0.9656,
+  "test_wape": 0.7221,
+  "persistence_mae": 0.9345,
+  "saved_at": "2026-10-17T22:34:34"
+}

@@ -1,0 +1,452 @@
+{
+  "city:Agra": {
+    "mean": 0.4552919708029197,
+    "std": 0.65888737959277,
+    "train_mean": 0.455292,
+    "train_std": 0.658887,
+    "train_min": 0.0,
+    "train_max": 4.0,
+    "n_train_days": 1096
+  },
+  "city:Ahmedabad": {
+    "mean": 1.0930656934306568,
+    "std": 0.9984053431652975,
+    "train_mean": 1.093066,
+    "train_std": 0.998405,
+    "train_min": 0.0,
+    "train_max": 5.0,
+    "n_train_days": 1096
+  },
+  "city:Bangalore": {
+    "mean": 2.147810218978102,
+    "std": 1.399965701002408,
+    "train_mean": 2.14781,
+    "train_std": 1.399966,
+    "train_min": 0.0,
+    "train_max": 7.0,
+    "n_train_days": 1096
+  },
+  "city:Bhopal": {
+    "mean": 0.3895985401459854,
+    "std": 0.6076169673206723,
+    "train_mean": 0.389599,
+    "train_std": 0.607617,
+    "train_min": 0.0,
+    "train_max": 3.0,
+    "n_train_days": 1096
+  },
+  "city:Chennai": {
+    "mean": 1.510036496350365,
+    "std": 1.162793640231536,
+    "train_mean": 1.510036,
+    "train_std": 1.162794,
+    "train_min": 0.0,
+    "train_max": 7.0,
+    "n_train_days": 1096
+  },
+  "city:Delhi": {
+    "mean": 3.2791970802919708,
+    "std": 1.6672471994077787,
+    "train_mean": 3.279197,
+    "train_std": 1.667247,
+    "train_min": 0.0,
+    "train_max": 12.0,
+    "n_train_days": 1096
+  },
+  "city:Faridabad": {
+    "mean": 0.20437956204379562,
+    "std": 0.43166096001353677,
+    "train_mean": 0.20438,
+    "train_std": 0.431661,
+    "train_min": 0.0,
+    "train_max": 2.0,
+    "n_train_days": 1096
+  },
+  "city:Ghaziabad": {
+    "mean": 0.416970802919708,
+    "std": 0.6353661102372721,
+    "train_mean": 0.416971,
+    "train_std": 0.635366,
+    "train_min": 0.0,
+    "train_max": 3.0,
+    "n_train_days": 1096
+  },
+  "city:Hyderabad": {
+    "mean": 1.729014598540146,
+    "std": 1.236797922854281,
+    "train_mean": 1.729015,
+    "train_std": 1.236798,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  },
+  "city:Indore": {
+    "mean": 0.43156934306569344,
+    "std": 0.6470509326359989,
+    "train_mean": 0.431569,
+    "train_std": 0.647051,
+    "train_min": 0.0,
+    "train_max": 3.0,
+    "n_train_days": 1096
+  },
+  "city:Jaipur": {
+    "mean": 0.906021897810219,
+    "std": 0.9443069212731005,
+    "train_mean": 0.906022,
+    "train_std": 0.944307,
+    "train_min": 0.0,
+    "train_max": 5.0,
+    "n_train_days": 1096
+  },
+  "city:Kalyan": {
+    "mean": 0.22262773722627738,
+    "std": 0.45777830683503173,
+    "train_mean": 0.222628,
+    "train_std": 0.457778,
+    "train_min": 0.0,
+    "train_max": 3.0,
+    "n_train_days": 1096
+  },
+  "city:Kanpur": {
+    "mean": 0.6706204379562044,
+    "std": 0.81617653764623,
+    "train_mean": 0.67062,
+    "train_std": 0.816177,
+    "train_min": 0.0,
+    "train_max": 5.0,
+    "n_train_days": 1096
+  },
+  "city:Kolkata": {
+    "mean": 1.510948905109489,
+    "std": 1.1768248033701825,
+    "train_mean": 1.510949,
+    "train_std": 1.176825,
+    "train_min": 0.0,
+    "train_max": 7.0,
+    "n_train_days": 1096
+  },
+  "city:Lucknow": {
+    "mean": 0.8540145985401459,
+    "std": 0.9497609840345,
+    "train_mean": 0.854015,
+    "train_std": 0.949761,
+    "train_min": 0.0,
+    "train_max": 5.0,
+    "n_train_days": 1096
+  },
+  "city:Ludhiana": {
+    "mean": 0.44525547445255476,
+    "std": 0.6567416586951453,
+    "train_mean": 0.445255,
+    "train_std": 0.656742,
+    "train_min": 0.0,
+    "train_max": 3.0,
+    "n_train_days": 1096
+  },
+  "city:Meerut": {
+    "mean": 0.22627737226277372,
+    "std": 0.4888195333692323,
+    "train_mean": 0.226277,
+    "train_std": 0.48882,
+    "train_min": 0.0,
+    "train_max": 3.0,
+    "n_train_days": 1096
+  },
+  "city:Mumbai": {
+    "mean": 2.593065693430657,
+    "std": 1.5098542792566052,
+    "train_mean": 2.593066,
+    "train_std": 1.509854,
+    "train_min": 0.0,
+    "train_max": 8.0,
+    "n_train_days": 1096
+  },
+  "city:Nagpur": {
+    "mean": 0.6313868613138686,
+    "std": 0.800934839273259,
+    "train_mean": 0.631387,
+    "train_std": 0.800935,
+    "train_min": 0.0,
+    "train_max": 5.0,
+    "n_train_days": 1096
+  },
+  "city:Nashik": {
+    "mean": 0.21897810218978103,
+    "std": 0.48841062757307535,
+    "train_mean": 0.218978,
+    "train_std": 0.488411,
+    "train_min": 0.0,
+    "train_max": 3.0,
+    "n_train_days": 1096
+  },
+  "city:Patna": {
+    "mean": 0.4142335766423358,
+    "std": 0.6407240687716249,
+    "train_mean": 0.414234,
+    "train_std": 0.640724,
+    "train_min": 0.0,
+    "train_max": 3.0,
+    "n_train_days": 1096
+  },
+  "city:Pune": {
+    "mean": 1.2956204379562044,
+    "std": 1.1503010467996722,
+    "train_mean": 1.29562,
+    "train_std": 1.150301,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  },
+  "city:Rajkot": {
+    "mean": 0.18065693430656934,
+    "std": 0.4099914622211676,
+    "train_mean": 0.180657,
+    "train_std": 0.409991,
+    "train_min": 0.0,
+    "train_max": 2.0,
+    "n_train_days": 1096
+  },
+  "city:Srinagar": {
+    "mean": 0.22536496350364962,
+    "std": 0.47312331344095593,
+    "train_mean": 0.225365,
+    "train_std": 0.473123,
+    "train_min": 0.0,
+    "train_max": 3.0,
+    "n_train_days": 1096
+  },
+  "city:Surat": {
+    "mean": 0.6496350364963503,
+    "std": 0.7662234706321821,
+    "train_mean": 0.649635,
+    "train_std": 0.766223,
+    "train_min": 0.0,
+    "train_max": 4.0,
+    "n_train_days": 1096
+  },
+  "city:Thane": {
+    "mean": 0.42427007299270075,
+    "std": 0.6532585475753736,
+    "train_mean": 0.42427,
+    "train_std": 0.653259,
+    "train_min": 0.0,
+    "train_max": 3.0,
+    "n_train_days": 1096
+  },
+  "city:Varanasi": {
+    "mean": 0.22445255474452555,
+    "std": 0.4745192260848134,
+    "train_mean": 0.224453,
+    "train_std": 0.474519,
+    "train_min": 0.0,
+    "train_max": 3.0,
+    "n_train_days": 1096
+  },
+  "city:Vasai": {
+    "mean": 0.2198905109489051,
+    "std": 0.4520900236368878,
+    "train_mean": 0.219891,
+    "train_std": 0.45209,
+    "train_min": 0.0,
+    "train_max": 2.0,
+    "n_train_days": 1096
+  },
+  "city:Visakhapatnam": {
+    "mean": 0.42974452554744524,
+    "std": 0.648264336564392,
+    "train_mean": 0.429745,
+    "train_std": 0.648264,
+    "train_min": 0.0,
+    "train_max": 3.0,
+    "n_train_days": 1096
+  },
+  "crime_type:ARSON": {
+    "mean": 1.1286496350364963,
+    "std": 1.0112778293067202,
+    "train_mean": 1.12865,
+    "train_std": 1.011278,
+    "train_min": 0.0,
+    "train_max": 7.0,
+    "n_train_days": 1096
+  },
+  "crime_type:ASSAULT": {
+    "mean": 1.1313868613138687,
+    "std": 1.0442230251487143,
+    "train_mean": 1.131387,
+    "train_std": 1.044223,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  },
+  "crime_type:BURGLARY": {
+    "mean": 1.1651459854014599,
+    "std": 1.068420527668641,
+    "train_mean": 1.165146,
+    "train_std": 1.068421,
+    "train_min": 0.0,
+    "train_max": 5.0,
+    "n_train_days": 1096
+  },
+  "crime_type:COUNTERFEITING": {
+    "mean": 1.0976277372262773,
+    "std": 0.9975123401340443,
+    "train_mean": 1.097628,
+    "train_std": 0.997512,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  },
+  "crime_type:CYBERCRIME": {
+    "mean": 1.1286496350364963,
+    "std": 1.0458731908118646,
+    "train_mean": 1.12865,
+    "train_std": 1.045873,
+    "train_min": 0.0,
+    "train_max": 7.0,
+    "n_train_days": 1096
+  },
+  "crime_type:DOMESTIC VIOLENCE": {
+    "mean": 1.1833941605839415,
+    "std": 1.0163525083748108,
+    "train_mean": 1.183394,
+    "train_std": 1.016353,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  },
+  "crime_type:DRUG OFFENSE": {
+    "mean": 1.1113138686131387,
+    "std": 1.0439343866720143,
+    "train_mean": 1.111314,
+    "train_std": 1.043934,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  },
+  "crime_type:EXTORTION": {
+    "mean": 1.0912408759124088,
+    "std": 0.9912371133949209,
+    "train_mean": 1.091241,
+    "train_std": 0.991237,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  },
+  "crime_type:FIREARM OFFENSE": {
+    "mean": 1.166058394160584,
+    "std": 1.0401507875417384,
+    "train_mean": 1.166058,
+    "train_std": 1.040151,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  },
+  "crime_type:FRAUD": {
+    "mean": 1.1806569343065694,
+    "std": 1.0697524813511885,
+    "train_mean": 1.180657,
+    "train_std": 1.069752,
+    "train_min": 0.0,
+    "train_max": 5.0,
+    "n_train_days": 1096
+  },
+  "crime_type:HOMICIDE": {
+    "mean": 1.166058394160584,
+    "std": 1.0419036883801667,
+    "train_mean": 1.166058,
+    "train_std": 1.041904,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  },
+  "crime_type:IDENTITY THEFT": {
+    "mean": 1.1414233576642336,
+    "std": 1.0230372785597954,
+    "train_mean": 1.141423,
+    "train_std": 1.023037,
+    "train_min": 0.0,
+    "train_max": 5.0,
+    "n_train_days": 1096
+  },
+  "crime_type:ILLEGAL POSSESSION": {
+    "mean": 1.125,
+    "std": 1.0713058236951816,
+    "train_mean": 1.125,
+    "train_std": 1.071306,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  },
+  "crime_type:KIDNAPPING": {
+    "mean": 1.1642335766423357,
+    "std": 1.056971104735069,
+    "train_mean": 1.164234,
+    "train_std": 1.056971,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  },
+  "crime_type:PUBLIC INTOXICATION": {
+    "mean": 1.1341240875912408,
+    "std": 1.0451852414676701,
+    "train_mean": 1.134124,
+    "train_std": 1.045185,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  },
+  "crime_type:ROBBERY": {
+    "mean": 1.1614963503649636,
+    "std": 1.052636222258211,
+    "train_mean": 1.161496,
+    "train_std": 1.052636,
+    "train_min": 0.0,
+    "train_max": 5.0,
+    "n_train_days": 1096
+  },
+  "crime_type:SEXUAL ASSAULT": {
+    "mean": 1.156021897810219,
+    "std": 1.0560566781899932,
+    "train_mean": 1.156022,
+    "train_std": 1.056057,
+    "train_min": 0.0,
+    "train_max": 5.0,
+    "n_train_days": 1096
+  },
+  "crime_type:SHOPLIFTING": {
+    "mean": 1.1322992700729928,
+    "std": 1.0392904504345406,
+    "train_mean": 1.132299,
+    "train_std": 1.03929,
+    "train_min": 0.0,
+    "train_max": 5.0,
+    "n_train_days": 1096
+  },
+  "crime_type:TRAFFIC VIOLATION": {
+    "mean": 1.1268248175182483,
+    "std": 1.0556466824729795,
+    "train_mean": 1.126825,
+    "train_std": 1.055647,
+    "train_min": 0.0,
+    "train_max": 5.0,
+    "n_train_days": 1096
+  },
+  "crime_type:VANDALISM": {
+    "mean": 1.217153284671533,
+    "std": 1.0386322061805555,
+    "train_mean": 1.217153,
+    "train_std": 1.038632,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  },
+  "crime_type:VEHICLE - STOLEN": {
+    "mean": 1.0912408759124088,
+    "std": 0.991237113394921,
+    "train_mean": 1.091241,
+    "train_std": 0.991237,
+    "train_min": 0.0,
+    "train_max": 6.0,
+    "n_train_days": 1096
+  }
+}
