@@ -61,12 +61,7 @@ class Settings(BaseSettings):
     EVIDENCE_UPLOAD_PATH: str = "evidence"
     SIGNED_URL_EXPIRATION_SECONDS: int = 3600
 
-    # AI / MLOps paths (relative to repository root when deployed with /app layout)
-    AI_MODELS_DIR: str = "ai/models"
-    AI_REGISTRY_DIR: str = "ai/registry"
-    AI_REGISTRY_INDEX: str = "ai/registry/registry_index.json"
-    AI_ACTIVE_VERSION_FILE: str = "ai/registry/active_version.json"
-    AI_TRAINING_STATISTICS: str = "ai/models/training_statistics.json"
+    # Logging
     LOG_DIR: str = "logs"
 
     # Enterprise Hardening (Phase 9)
