@@ -27,16 +27,16 @@ async def lifespan(app: FastAPI):
     """
     logger.info(f"Starting up {APP_NAME}...")
     try:
-        from app.ai.model_service import ModelService
-        ModelService.get_instance().load_models()
-    except Exception as e:
-        logger.warning(f"Could not load Phase 3/4 models in ModelService during startup: {e}")
+        from app.ai.forecast_service import get_forecast_service
 
-    try:
-        from app.ai.model_loader import ModelLoader
-        ModelLoader.get_instance().load_all_models()
+        service = get_forecast_service()
+        if not service.load():
+            logger.warning(
+                "GRU forecaster not loaded at startup: %s",
+                service.load_error,
+            )
     except Exception as e:
-        logger.warning(f"Could not load PyTorch models during startup: {e}")
+        logger.warning(f"Could not load the GRU forecaster during startup: {e}")
 
     try:
         from app.services.mlops_service import MLOpsService

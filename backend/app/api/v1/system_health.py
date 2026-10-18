@@ -7,20 +7,25 @@ Zero fake metrics. Uses psutil, time, sqlalchemy text queries, and real PyTorch 
 
 import os
 import time
-from typing import Any, Dict, List, Optional
+import json
+from typing import Any, Dict, List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 import psutil
 
-from app.api.dependencies import get_current_active_user
 from app.db.session import get_db
-from app.ai.model_service import ModelService
-from app.ai.model_loader import ModelLoader
+from app.ai.forecast_service import get_forecast_service
+from app.core.paths import read_active_forecast_version
 
 router = APIRouter()
 
 _START_TIME = time.time()
+
+
+def _active_registry_version() -> str:
+    """Read the active forecast model version (single source of truth)."""
+    return read_active_forecast_version()
 
 
 def get_system_metrics() -> Dict[str, Any]:
@@ -44,101 +49,32 @@ def get_system_metrics() -> Dict[str, Any]:
 
 
 def get_ai_models_health() -> List[Dict[str, Any]]:
-    """Inspects all PyTorch deep learning models loaded in memory."""
-    models: List[Dict[str, Any]] = []
+    """Inspects the single GRU forecasting model loaded in memory."""
+    service = get_forecast_service()
+    service.load()
+    version = _active_registry_version()
 
-    # 1. Phase 3 GRU Temporal Forecaster
-    ms = ModelService.get_instance()
-    gru_loaded = ms.temporal_predictor is not None and getattr(ms.temporal_predictor, "model", None) is not None
-    gru_params = (
-        sum(p.numel() for p in ms.temporal_predictor.model.parameters())
-        if gru_loaded
-        else 40583
-    )
-    models.append({
-        "model_name": "CrimeGRUForecaster",
-        "model_type": "temporal_sequence_forecaster",
-        "version": "v1.0.0",
-        "loaded": gru_loaded or ms.is_loaded,
-        "checkpoint_available": True,
-        "parameter_count": gru_params,
-        "inference_available": True,
-        "status": "ACTIVE",
-    })
+    loaded = bool(service.is_loaded and service.predictor is not None)
+    param_count = 0
+    if loaded and service.predictor is not None:
+        param_count = sum(p.numel() for p in service.predictor.model.parameters())
 
-    # 2. Phase 4 CNN Hotspot Model
-    cnn_loaded = ms.hotspot_predictor is not None and getattr(ms.hotspot_predictor, "model", None) is not None
-    cnn_params = (
-        sum(p.numel() for p in ms.hotspot_predictor.model.parameters())
-        if cnn_loaded
-        else 262461
-    )
-    models.append({
-        "model_name": "CityHotspotCNN",
-        "model_type": "spatial_hotspot_forecaster",
-        "version": "v1.0.0",
-        "loaded": cnn_loaded or ms.is_loaded,
-        "checkpoint_available": True,
-        "parameter_count": cnn_params,
-        "inference_available": True,
-        "status": "ACTIVE",
-    })
+    models: List[Dict[str, Any]] = [
+        {
+            "model_name": "CrimeGRUForecaster",
+            "model_type": "gru_crime_count_forecaster",
+            "version": version,
+            "loaded": loaded,
+            "checkpoint_available": loaded,
+            "parameter_count": param_count,
+            "inference_available": loaded,
+            "status": "ACTIVE" if loaded else "UNAVAILABLE",
+        }
+    ]
 
-    # 3. FT-Transformer Classifier
-    ml = ModelLoader.get_instance()
-    ft_loaded = ml.ft_classifier is not None
-    ft_params = (
-        sum(p.numel() for p in ml.ft_classifier.parameters())
-        if ft_loaded
-        else 28356
-    )
-    models.append({
-        "model_name": "FTTransformerClassifier",
-        "model_type": "tabular_deep_learning",
-        "version": "v1.0.0",
-        "loaded": ft_loaded or ml.is_loaded,
-        "checkpoint_available": True,
-        "parameter_count": ft_params,
-        "inference_available": True,
-        "status": "ACTIVE",
-    })
-
-    # 4. N-BEATS Hierarchical Forecaster
-    nb_loaded = ml.nbeats_forecaster is not None
-    nb_params = (
-        sum(p.numel() for p in ml.nbeats_forecaster.parameters())
-        if nb_loaded
-        else 1941870
-    )
-    models.append({
-        "model_name": "NBEATSForecaster",
-        "model_type": "hierarchical_trend_forecaster",
-        "version": "v1.0.0",
-        "loaded": nb_loaded or ml.is_loaded,
-        "checkpoint_available": True,
-        "parameter_count": nb_params,
-        "inference_available": True,
-        "status": "ACTIVE",
-    })
-
-    # 5. Crime Embedding Network
-    emb_loaded = ml.embedding_net is not None
-    emb_params = (
-        sum(p.numel() for p in ml.embedding_net.parameters())
-        if emb_loaded
-        else 65344
-    )
-    models.append({
-        "model_name": "CrimeEmbeddingNetwork",
-        "model_type": "contrastive_dense_embeddings",
-        "version": "v1.0.0",
-        "loaded": emb_loaded or ml.is_loaded,
-        "checkpoint_available": True,
-        "parameter_count": emb_params,
-        "inference_available": True,
-        "status": "ACTIVE",
-    })
-
+    # The Phase 4 CNN hotspot model was removed 2026-10-16 (tabular data, not images).
+    # Former classifiers (FT-Transformer, MLP, N-BEATS, Embedding) were removed with
+    # the simplification to a single GRU model.
     return models
 
 
@@ -154,6 +90,7 @@ async def build_system_health_payload(db: AsyncSession) -> Dict[str, Any]:
 
     sys_metrics = get_system_metrics()
     models = get_ai_models_health()
+    version = _active_registry_version()
     all_models_ok = all(m["inference_available"] for m in models)
 
     overall_status = "healthy" if db_ok and all_models_ok else "degraded"
@@ -169,7 +106,7 @@ async def build_system_health_payload(db: AsyncSession) -> Dict[str, Any]:
         "ai_models": models,
         "total_model_parameters": sum(m["parameter_count"] for m in models),
         "registry": {
-            "version": "v1.0.0",
+            "version": version,
             "status": "VALIDATED",
         },
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()),

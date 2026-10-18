@@ -1,148 +1,124 @@
 """
 backend/app/api/v1/ai.py
 ========================
-FastAPI Router exposing Production PyTorch Deep Learning REST Endpoints.
+FastAPI router exposing the single CrimeLens AI forecasting model.
+
 Endpoints:
-  POST /api/v1/ai/predict       — Real-time Crime Domain Classification & DB logging
-  POST /api/v1/ai/forecast      — N-BEATS 7d / 30d / 90d Time-Series Forecasting
-  POST /api/v1/ai/embedding     — 64-dim Dense Contrastive Vector Embedding Generation
-  POST /api/v1/ai/explain       — Captum Integrated Gradients & Saliency Feature Attribution
-  POST /api/v1/ai/batch-predict — Bulk CSV / JSON Batch Inference
-  GET  /api/v1/ai/models        — Active Model Version & Metadata (v1.0.0)
-  GET  /api/v1/ai/health        — AI Subsystem Health & Warmup Status
+  POST /api/v1/ai/forecast — 7-day GRU crime-count forecast for a scope (city or crime type)
+  GET  /api/v1/ai/scopes   — list supported forecasting scopes
+  GET  /api/v1/ai/models   — active model version & metadata
+  GET  /api/v1/ai/health   — forecasting subsystem health
 """
 
-from typing import Annotated, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.forecast_service import get_forecast_service
+from app.core.enums.prediction_type import PredictionType
 from app.db.session import get_db
-from app.services.ai_service import AIService
 from app.schemas.ai import (
-    CrimePredictionRequest,
-    CrimePredictionResponse,
     ForecastRequest,
     ForecastResponse,
-    EmbeddingRequest,
-    EmbeddingResponse,
-    ExplainabilityRequest,
-    ExplainabilityResponse,
-    BatchPredictionRequest,
-    BatchPredictionResponse,
     ModelHealthResponse,
     ModelMetadataResponse,
+    ScopeListResponse,
 )
+from app.services.prediction_log import log_prediction
 
 router = APIRouter()
-ai_service = AIService()
-
-
-@router.post(
-    "/predict",
-    response_model=CrimePredictionResponse,
-    summary="Real-time Crime Domain Classification",
-    description="Classifies incident sample payload into Crime Domain using PyTorch FT-Transformer & Ensemble models.",
-)
-async def predict_crime(
-    request: CrimePredictionRequest,
-    db: Annotated[AsyncSession, Depends(get_db)],
-):
-    try:
-        response = await ai_service.predict_crime(request, db=db)
-        return response
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Crime prediction failed: {str(e)}",
-        ) from e
 
 
 @router.post(
     "/forecast",
     response_model=ForecastResponse,
-    summary="Multi-Horizon Crime Trend Forecasting",
-    description="Predicts future incident volume counts (7, 30, 90 days) using PyTorch N-BEATS Forecaster.",
+    summary="7-Day Crime-Count Forecast (GRU)",
+    description=(
+        "Forecasts daily crime counts for the next seven days for a selected city or crime type "
+        "using the single CrimeGRUForecaster model. Includes historical counts, an honest "
+        "held-out backtest and evaluation metrics."
+    ),
 )
-async def forecast_crime(request: ForecastRequest):
-    try:
-        response = await ai_service.forecast_crime(request)
-        return response
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Crime forecasting failed: {str(e)}",
-        ) from e
-
-
-@router.post(
-    "/embedding",
-    response_model=EmbeddingResponse,
-    summary="Generate 64-Dim Dense Vector Embedding",
-    description="Generates an L2-normalized 64-dimensional dense vector embedding (E in R^64) for vector search and RAG.",
-)
-async def generate_embedding(request: EmbeddingRequest):
-    try:
-        response = await ai_service.generate_embedding(request)
-        return response
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Embedding generation failed: {str(e)}",
-        ) from e
-
-
-@router.post(
-    "/explain",
-    response_model=ExplainabilityResponse,
-    summary="Captum Explainable AI (XAI) Attribution",
-    description="Computes feature importance rankings and input sensitivity via Captum Integrated Gradients & Saliency.",
-)
-async def explain_prediction(request: ExplainabilityRequest):
-    try:
-        response = await ai_service.explain_prediction(request)
-        return response
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Explainability analysis failed: {str(e)}",
-        ) from e
-
-
-@router.post(
-    "/batch-predict",
-    response_model=BatchPredictionResponse,
-    summary="Bulk Batch Crime Prediction",
-    description="Performs bulk inference on a list of incident records.",
-)
-async def batch_predict(
-    request: BatchPredictionRequest,
+async def forecast_crime(
+    request: ForecastRequest,
+    http_req: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
+    service = get_forecast_service()
     try:
-        response = await ai_service.batch_predict(request, db=db)
-        return response
-    except Exception as e:
+        result = service.forecast(request.scope_type, request.scope_value)
+    except KeyError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except Exception as exc:  # noqa: BLE001
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Batch prediction failed: {str(e)}",
-        ) from e
+            detail=f"Forecast failed: {exc}",
+        ) from exc
+
+    avg_predicted = (
+        sum(d["predicted_count"] for d in result["forecast"]) / len(result["forecast"])
+        if result.get("forecast")
+        else 0.0
+    )
+    await log_prediction(
+        db,
+        action="PREDICTION_FORECAST",
+        prediction_type=PredictionType.TREND,
+        label=f"7-Day Forecast for {result['scope_display_name']} ({result['scope_type']})",
+        model_name=result["model_name"],
+        model_version=result["model_version"],
+        confidence=round(float(avg_predicted), 4),
+        execution_time_ms=0,
+        raw_output={"scope_key": result["scope_key"], "forecast": result["forecast"]},
+        audit_details={
+            "endpoint": "/api/v1/ai/forecast",
+            "scope_type": result["scope_type"],
+            "scope_value": result["scope_display_name"],
+            "horizon_days": result["forecast_horizon_days"],
+        },
+        client_ip=http_req.client.host if http_req.client else None,
+        user_agent=http_req.headers.get("user-agent"),
+    )
+    return result
+
+
+@router.get(
+    "/scopes",
+    response_model=ScopeListResponse,
+    summary="List Supported Forecasting Scopes",
+    description="Returns every supported city and crime-type scope for the forecasting model.",
+)
+async def list_scopes(
+    scope_type: Annotated[str | None, Query(description="Optional filter: 'city' or 'crime_type'")] = None,
+):
+    scopes = get_forecast_service().available_scopes()
+    if scope_type:
+        scopes = [s for s in scopes if s["scope_type"] == scope_type]
+    return ScopeListResponse(scopes=scopes, count=len(scopes))
 
 
 @router.get(
     "/models",
     response_model=ModelMetadataResponse,
     summary="Active Model Metadata & Version Information",
-    description="Returns active model version, dataset MD5 checksum, framework details, and parameter metadata.",
+    description="Returns the active GRU forecaster version, dataset hash, architecture and held-out metrics.",
 )
 async def get_model_metadata():
-    return ai_service.get_model_metadata()
+    try:
+        meta = get_forecast_service().model_metadata()
+    except RuntimeError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    return ModelMetadataResponse(**meta)
 
 
 @router.get(
     "/health",
     response_model=ModelHealthResponse,
-    summary="AI Subsystem Health & Probe Status",
-    description="Checks PyTorch model loading status and warmup state.",
+    summary="Forecasting Subsystem Health",
+    description="Reports whether the GRU forecaster is loaded and how many scopes it serves.",
 )
 async def get_health_status():
-    return ai_service.get_health_status()
+    return get_forecast_service().health()

@@ -233,21 +233,6 @@ TIMELINE_ACTIONS = [
     ("BAIL_GRANTED",          "Accused released on bail by court. Monitoring order imposed."),
 ]
 
-CRIME_TYPE_LABELS = {
-    "ASSAULT": "Physical Assault", "HOMICIDE": "Homicide / Murder",
-    "ROBBERY": "Armed Robbery", "BURGLARY": "Residential Burglary",
-    "ARSON": "Property Arson", "KIDNAPPING": "Abduction / Kidnapping",
-    "FRAUD": "Financial Fraud", "CYBERCRIME": "Cybercrime",
-    "IDENTITY THEFT": "Identity Theft", "DRUG OFFENSE": "Narcotics Offense",
-    "VEHICLE - STOLEN": "Motor Vehicle Theft", "VANDALISM": "Property Vandalism",
-    "EXTORTION": "Extortion / Blackmail", "COUNTERFEITING": "Counterfeiting",
-    "SHOPLIFTING": "Retail Shoplifting", "SEXUAL ASSAULT": "Sexual Offense",
-    "PUBLIC INTOXICATION": "Public Order Offense", "ILLEGAL POSSESSION": "Illegal Possession",
-    "FIREARM OFFENSE": "Firearm Offense", "TRAFFIC VIOLATION": "Traffic Offense",
-    "DOMESTIC VIOLENCE": "Domestic Violence",
-}
-
-RISK_LABELS   = ["VERY_LOW", "LOW", "MEDIUM", "HIGH", "CRITICAL"]
 HOTSPOT_LABELS = ["STABLE",  "EMERGING", "ACTIVE", "HOTSPOT", "CRITICAL_HOTSPOT"]
 
 CATEGORY_DEFS = {
@@ -321,12 +306,6 @@ def make_loc(city: str, idx: int) -> dict:
         "updated_at": NOW - timedelta(days=500),
         "deleted_at": None,
     }
-
-def confidence_for(crime_desc: str) -> float:
-    base = {"HOMICIDE": 0.91, "ROBBERY": 0.87, "ASSAULT": 0.85, "BURGLARY": 0.83,
-            "FRAUD": 0.79, "CYBERCRIME": 0.76, "DRUG OFFENSE": 0.82}.get(crime_desc, 0.74)
-    return round(min(0.99, base + random.uniform(-0.09, 0.09)), 4)
-
 
 # ─────────────────────────────────────────────────────────────────────────
 # MAIN
@@ -683,60 +662,31 @@ async def seed():
         print("\n[10/10] Seeding AI predictions...")
         pred_rows = []
         for pi, rm in enumerate(resolved):
-            cd    = rm["crime_desc"]
-            conf  = confidence_for(cd)
-            label = CRIME_TYPE_LABELS.get(cd, cd.title())
             prio_idx = {"LOW": 1, "MEDIUM": 2, "HIGH": 3, "CRITICAL": 4}.get(rm["priority"], 2)
             pred_dt  = rm["incident_date"] + timedelta(hours=random.randint(4, 24))
             if pred_dt > NOW:
                 pred_dt = NOW - timedelta(hours=1)
 
-            # Crime-type classification
+            # 7-day crime-count forecast produced by the single production model (GRU).
+            forecast_counts = [round(prio_idx * 0.6 + random.uniform(0.1, 1.2), 3) for _ in range(7)]
             pred_rows.append({
-                "id": _uid(f"csv:pred:type:{pi}:{rm['crime_number']}"),
+                "id": _uid(f"csv:pred:trend:{pi}:{rm['crime_number']}"),
                 "report_id": rm["id"],
                 "user_id":   rm["reporter_id"],
-                "prediction_label": label,
-                "prediction_type":  "CRIME_TYPE",
-                "confidence_score": conf,
-                "model_name":    "EnsembleClassifier",
-                "model_version": "v1.0.0",
+                "prediction_label": f"7-Day Forecast for {rm['city']} (city)",
+                "prediction_type":  "TREND",
+                "confidence_score": round(sum(forecast_counts) / len(forecast_counts), 4),
+                "model_name":    "CrimeGRUForecaster",
+                "model_version": "forecast_v1",
                 "prediction_time": pred_dt,
-                "execution_time_ms": random.randint(45, 280),
-                "explanation": f"High-confidence classification based on crime pattern, location ({rm['city']}), weapon type, and temporal features.",
+                "execution_time_ms": random.randint(20, 120),
+                "explanation": f"Seeded demo history: 7-day GRU crime-count forecast for {rm['city']}.",
                 "raw_output": {
-                    "top_prediction": label, "confidence": conf,
-                    "city": rm["city"], "crime_number": rm["crime_number"],
-                    "features_used": ["city", "time_of_day", "weapon_type", "victim_profile"],
+                    "scope_type": "city", "scope_value": rm["city"],
+                    "horizon_days": 7, "forecast_counts": forecast_counts,
                 },
                 "created_at": pred_dt, "updated_at": pred_dt, "deleted_at": None,
             })
-
-            # Risk score (~40%)
-            if pi % 3 == 0:
-                risk_label = RISK_LABELS[min(prio_idx, 4)]
-                pred_rows.append({
-                    "id": _uid(f"csv:pred:risk:{pi}:{rm['crime_number']}"),
-                    "report_id": rm["id"],
-                    "user_id":   rm["reporter_id"],
-                    "prediction_label": risk_label,
-                    "prediction_type":  "RISK_SCORE",
-                    "confidence_score": round(random.uniform(0.70, 0.95), 4),
-                    "model_name":    "CrimeEmbeddingNetwork",
-                    "model_version": "v1.0.0",
-                    "prediction_time": pred_dt + timedelta(minutes=5),
-                    "execution_time_ms": random.randint(100, 350),
-                    "explanation": f"Risk assessment for {rm['city']} zone based on recent crime trends and historical density.",
-                    "raw_output": {
-                        "risk_level": risk_label,
-                        "risk_score": round(prio_idx / 4.0 + random.uniform(-0.1, 0.1), 4),
-                        "city": rm["city"],
-                        "factors": ["historical_density", "time_factor", "crime_severity"],
-                    },
-                    "created_at": pred_dt + timedelta(minutes=5),
-                    "updated_at": pred_dt + timedelta(minutes=5),
-                    "deleted_at": None,
-                })
 
             # Hotspot (~25%)
             if pi % 5 == 0:
@@ -748,11 +698,11 @@ async def seed():
                     "prediction_label": hl,
                     "prediction_type":  "HOTSPOT",
                     "confidence_score": round(random.uniform(0.68, 0.93), 4),
-                    "model_name":    "CityHotspotCNN",
-                    "model_version": "v1.0.0",
+                    "model_name":    "CityHotspotDeprecated",
+                    "model_version": "retired",
                     "prediction_time": pred_dt + timedelta(minutes=10),
                     "execution_time_ms": random.randint(200, 600),
-                    "explanation": f"Spatial clustering model classifies {rm['city']} zone as '{hl}' based on incident density.",
+                    "explanation": f"Historical zone classification for {rm['city']} as '{hl}' (CNN producer removed 2026-10-16; record retained for history).",
                     "raw_output": {
                         "zone_classification": hl, "city": rm["city"],
                         "heat_index": round(prio_idx * 0.25 + random.uniform(0, 0.2), 4),
