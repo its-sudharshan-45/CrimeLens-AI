@@ -1,0 +1,43 @@
+{
+    "model_version": "v1.0.0",
+    "dataset_hash_md5": "9bb143539b74ecef9274f167603bb490",
+    "generated_at": "2026-07-24T20:45:09.991195",
+    "numerical_features": {
+        "Victim Age": {
+            "mean": 44.49125996015936,
+            "std": 20.225549651192335,
+            "min": 10.0,
+            "max": 79.0
+        },
+        "Crime Code": {
+            "mean": 349.36025896414344,
+            "std": 144.16920518761302,
+            "min": 100.0,
+            "max": 599.0
+        },
+        "Police Deployed": {
+            "mean": 10.00625,
+            "std": 5.467951104969466,
+            "min": 1.0,
+            "max": 19.0
+        }
+    },
+    "category_frequencies": {
+        "Crime Domain": {
+            "Property Crime": 0.28,
+            "Violent Crime": 0.24,
+            "Cyber Crime": 0.22,
+            "White Collar Crime": 0.26
+        },
+        "Victim Gender": {
+            "M": 0.52,
+            "F": 0.48
+        }
+    },
+    "confidence_baseline": {
+        "mean": 0.55,
+        "std": 0.12,
+        "min": 0.25,
+        "max": 0.99
+    }
+}
