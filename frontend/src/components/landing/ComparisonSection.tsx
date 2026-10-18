@@ -24,12 +24,12 @@ const models: Model[] = [
     border: 'border-emerald-500/15',
   },
   {
-    id: 'cnn',
-    acronym: 'CNN',
-    name: 'Convolutional Neural Net',
-    role: 'Spatial Hotspot Analysis',
+    id: 'mlp',
+    acronym: 'R-MLP',
+    name: 'Residual MLP',
+    role: 'Tabular Crime Classification',
     description:
-      'Extracts spatial feature hierarchies from geographic crime data to identify concentrated high-risk zones.',
+      'Deep residual feedforward network with GELU and LayerNorm for structured tabular crime records; ensemble partner to the FT-Transformer.',
     accent: 'text-blue-400',
     bg: 'bg-blue-500/6',
     border: 'border-blue-500/15',

@@ -1,84 +1,16 @@
 /**
- * TypeScript Interfaces for CrimeLens AI Prediction API (Phase 5)
- * Mirrors backend app/schemas/prediction.py
+ * TypeScript interfaces for the legacy CrimeLens AI prediction API.
+ *
+ * Live forecasting now lives at POST /api/v1/ai/forecast. This module mirrors
+ * the remaining routes in `backend/app/api/v1/predictions.py`:
+ *   - POST /predict/hotspots — DEPRECATED 410 Gone (CNN removed 2026-10-16)
+ *   - GET  /predict/history  — paginated prediction audit history
+ *   - GET  /predict/stats    — aggregate prediction observability metrics
  */
 
 export interface HotspotPredictionRequest {
   top_n?: number;
   crime_type?: string;
-}
-
-export interface HotspotItem {
-  rank: number;
-  city: string;
-  predicted_crimes: number;
-  risk_score: number;
-  risk_level: 'High' | 'Medium' | 'Low';
-  confidence_score: number;
-}
-
-export interface HotspotPredictionResponse {
-  success: boolean;
-  prediction_type: string;
-  forecast_horizon_days: number;
-  total_cities_evaluated?: number;
-  filter_crime_type?: string;
-  hotspots: HotspotItem[];
-  confidence_metric?: string;
-  disclaimer: string;
-}
-
-export interface TemporalRiskRequest {
-  city: string;
-}
-
-export interface TemporalForecastDay {
-  day: number;
-  predicted_crimes: number;
-  confidence_score: number;
-  lower_bound_95?: number;
-  upper_bound_95?: number;
-}
-
-export interface HistoricalDay {
-  day_label: string;
-  crime_count: number;
-}
-
-export interface TemporalRiskResponse {
-  success: boolean;
-  prediction_type: string;
-  prediction_scope: string;
-  target_city?: string;
-  forecast_horizon_days: number;
-  forecast: TemporalForecastDay[];
-  historical_context?: HistoricalDay[];
-  uncertainty_method?: string;
-  disclaimer: string;
-}
-
-export interface InvestigationLeadRequest {
-  city: string;
-  crime_type?: string;
-  risk_level?: string;
-}
-
-export interface InvestigationLead {
-  priority: number;
-  category: string;
-  description: string;
-  reason: string;
-  confidence_score: number;
-}
-
-export interface InvestigationLeadResponse {
-  success: boolean;
-  prediction_type: string;
-  city?: string;
-  crime_type?: string;
-  risk_assessment?: string;
-  leads: InvestigationLead[];
-  disclaimer: string;
 }
 
 export interface PredictionHistoryItem {
@@ -97,4 +29,13 @@ export interface PredictionHistoryResponse {
   total: number;
   page: number;
   page_size: number;
+}
+
+export interface PredictionStatsResponse {
+  total_predictions: number;
+  predictions_today: number;
+  avg_execution_time_ms: number;
+  predictions_by_model: Record<string, number>;
+  predictions_by_type: Record<string, number>;
+  active_models: string[];
 }

@@ -1,107 +1,115 @@
 /**
- * TypeScript interfaces for CrimeLens AI – Phase 8
- * Mirrors backend app/schemas/ai.py and app/schemas/mlops.py exactly.
+ * TypeScript interfaces for CrimeLens AI.
+ *
+ * The project ships a SINGLE deep-learning model — the GRU crime-count
+ * forecaster — served at POST /api/v1/ai/forecast. These types mirror
+ * `backend/app/schemas/ai.py` and `backend/app/schemas/mlops.py`.
  */
 
-// ─── AI Prediction ─────────────────────────────────────────────────────────
+// ─── Forecasting scopes ─────────────────────────────────────────────────────
 
-export interface CrimePredictionRequest {
-  city: string;
-  crime_description: string;
-  victim_age: number;
-  victim_gender: string;
-  weapon_used?: string;
-  date_of_occurrence: string;   // dd-mm-yyyy HH:MM
-  time_of_occurrence: string;   // dd-mm-yyyy HH:MM
-  date_reported?: string | null;
-  case_closed?: string;         // "Yes" | "No"
-  crime_code?: number;
+export type ScopeType = 'city' | 'crime_type';
+
+export interface ScopeInfo {
+  key: string;
+  scope_type: ScopeType;
+  display_name: string;
 }
 
-export interface CrimePredictionResponse {
-  prediction_id: string | null;
-  predicted_domain: string;
-  domain_code: number;
-  confidence_score: number;
-  probabilities: Record<string, number>;
-  model_name: string;
-  model_version: string;
-  execution_time_ms: number;
-  timestamp: string;
+export interface ScopeListResponse {
+  scopes: ScopeInfo[];
+  count: number;
 }
 
-// ─── Forecasting ────────────────────────────────────────────────────────────
+// ─── Forecast ───────────────────────────────────────────────────────────────
 
 export interface ForecastRequest {
-  horizon: 7 | 30 | 90;
-  recent_sequence?: number[] | null;
+  scope_type: ScopeType;
+  scope_value: string;
+}
+
+export interface HistoricalPoint {
+  date: string;
+  count: number;
+}
+
+export interface ForecastDay {
+  day: number;
+  date: string;
+  predicted_count: number;
+  lower_bound_95: number;
+  upper_bound_95: number;
+}
+
+export interface ActualVsPredictedPoint {
+  date: string;
+  actual: number;
+  predicted: number;
+}
+
+export interface RegressionMetrics {
+  MAE: number;
+  RMSE: number;
+  WAPE: number;
+  sMAPE: number;
+  R2: number;
+  n_observations: number;
 }
 
 export interface ForecastResponse {
-  horizon: number;
-  forecast_dates: string[];
-  predicted_counts: number[];
-  total_projected_incidents: number;
+  success: boolean;
+  scope_key: string;
+  scope_type: ScopeType;
+  scope_display_name: string;
   model_name: string;
   model_version: string;
-  execution_time_ms: number;
-}
-
-// ─── Embedding ──────────────────────────────────────────────────────────────
-
-export interface EmbeddingResponse {
-  embedding_vector: number[];
-  embedding_dim: number;
-  l2_norm: number;
-  model_name: string;
-}
-
-// ─── Explainability (XAI) ───────────────────────────────────────────────────
-
-export interface FeatureAttribution {
-  feature_name: string;
-  attribution_score: number;
-}
-
-export interface ExplainabilityRequest {
-  sample_record: CrimePredictionRequest;
-  target_class?: number;
-}
-
-export interface ExplainabilityResponse {
-  predicted_domain: string;
-  confidence_score: number;
-  top_contributing_features: FeatureAttribution[];
-  saliency_scores: FeatureAttribution[];
-  model_name: string;
-  method: string;
-}
-
-// ─── Batch Prediction ───────────────────────────────────────────────────────
-
-export interface BatchPredictionResponse {
-  total_records: number;
-  predictions: CrimePredictionResponse[];
-  batch_execution_time_ms: number;
+  sequence_length: number;
+  forecast_horizon_days: number;
+  last_observed_date: string;
+  historical: HistoricalPoint[];
+  forecast: ForecastDay[];
+  actual_vs_predicted: ActualVsPredictedPoint[];
+  scope_test_metrics: Partial<RegressionMetrics>;
+  test_metrics: {
+    model?: RegressionMetrics;
+    persistence_baseline?: RegressionMetrics;
+    model_beats_baseline_MAE?: boolean;
+  };
+  per_horizon_metrics: Record<string, unknown>;
+  evaluation_summary: Record<string, unknown>;
+  uncertainty_method?: string | null;
+  disclaimer: string;
+  timestamp: string;
 }
 
 // ─── Model Health & Metadata ────────────────────────────────────────────────
 
 export interface ModelHealthResponse {
   status: string;
+  model_name: string;
+  loaded: boolean;
   device: string;
-  models_loaded: Record<string, boolean>;
-  warmup_complete: boolean;
+  registry_dir?: string | null;
+  n_scopes: number;
+  error?: string | null;
 }
 
 export interface ModelMetadataResponse {
   version: string;
-  framework: string;
-  flagship_model: string;
-  forecaster_model: string;
-  embedding_dim: number;
-  dataset_rows: number;
-  dataset_hash_md5: string;
+  primary_model: string;
+  framework?: string | null;
+  device?: string | null;
+  seed?: number | null;
+  seq_len?: number | null;
+  forecast_horizon?: number | null;
+  n_features?: number | null;
+  n_scopes?: number | null;
+  dataset_rows?: number | null;
+  dataset_hash_md5?: string | null;
+  test_mae?: number | null;
+  test_rmse?: number | null;
+  test_wape?: number | null;
+  persistence_mae?: number | null;
   saved_at?: string | null;
 }
 
@@ -200,20 +208,7 @@ export interface SystemStatusResponse {
   project_root: string;
 }
 
-// ─── Derived / UI helpers ───────────────────────────────────────────────────
-
-export type RiskLevel = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
-
-export function confidenceToRisk(confidence: number): RiskLevel {
-  if (confidence >= 0.85) return 'CRITICAL';
-  if (confidence >= 0.65) return 'HIGH';
-  if (confidence >= 0.40) return 'MEDIUM';
-  return 'LOW';
-}
-
-export function formatConfidence(score: number): string {
-  return `${(score * 100).toFixed(1)}%`;
-}
+// ─── UI helpers ─────────────────────────────────────────────────────────────
 
 export function formatUptime(seconds: number): string {
   const h = Math.floor(seconds / 3600);

@@ -22,7 +22,7 @@ export default function LandingPage() {
         {/* 3. How It Works — Analyze → Learn → Generate */}
         <HowItWorksSection />
 
-        {/* 4. Deep Learning — GRU, CNN, FT-Transformer, N-BEATS */}
+        {/* 4. Deep Learning — GRU, Residual MLP, FT-Transformer, N-BEATS */}
         <ComparisonSection />
 
         {/* 5. Responsible AI — "Decision Support, Not Decision Making." */}

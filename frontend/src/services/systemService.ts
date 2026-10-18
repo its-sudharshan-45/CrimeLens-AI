@@ -10,7 +10,6 @@ import {
   NotificationItem,
   BackupStatusOverview,
   SystemConfigDetails,
-  ObservabilityMetrics,
 } from '@/types/system';
 
 class SystemService {
@@ -49,7 +48,7 @@ class SystemService {
         category: 'prediction_generated',
         actor_name: 'Rajesh Sharma',
         actor_email: 'investigator.sharma@crimelens.ai',
-        description: 'Executed FTTransformer model for Delhi location — predicted Financial Fraud (94.2% confidence)',
+        description: 'Executed CrimeGRUForecaster for Delhi location — 7-day crime-count forecast generated',
         status: 'info',
       },
       {
@@ -297,14 +296,11 @@ class SystemService {
     try {
       const statsRes = await api.get('/predict/stats');
       const stats = statsRes.data || {};
-      const totalReq = stats.total_predictions || 100;
       const todayReq = stats.predictions_today || 10;
       const avgLat = stats.avg_execution_time_ms || 18.5;
 
       const endpoints: ApiEndpointMetric[] = [
-        { endpoint: '/predict/hotspots', method: 'POST', total_requests: Math.round(totalReq * 0.4), success_count: Math.round(totalReq * 0.4), error_count: 0, avg_latency_ms: avgLat, p95_latency_ms: avgLat * 1.8, status_2xx: Math.round(totalReq * 0.4), status_4xx: 0, status_5xx: 0 },
-        { endpoint: '/predict/temporal-risk', method: 'POST', total_requests: Math.round(totalReq * 0.35), success_count: Math.round(totalReq * 0.35), error_count: 0, avg_latency_ms: avgLat * 0.8, p95_latency_ms: avgLat * 1.5, status_2xx: Math.round(totalReq * 0.35), status_4xx: 0, status_5xx: 0 },
-        { endpoint: '/predict/investigation-leads', method: 'POST', total_requests: Math.round(totalReq * 0.25), success_count: Math.round(totalReq * 0.25), error_count: 0, avg_latency_ms: avgLat * 1.2, p95_latency_ms: avgLat * 2.1, status_2xx: Math.round(totalReq * 0.25), status_4xx: 0, status_5xx: 0 },
+        { endpoint: '/api/v1/ai/forecast', method: 'POST', total_requests: todayReq, success_count: todayReq, error_count: 0, avg_latency_ms: avgLat, p95_latency_ms: avgLat * 2.0, status_2xx: todayReq, status_4xx: 0, status_5xx: 0 },
       ];
 
       return {
@@ -387,8 +383,8 @@ class SystemService {
         timestamp: '2026-08-03 10:58:12',
         level: 'INFO',
         service: 'FastAPI Backend',
-        module: 'app.services.ai_service',
-        message: 'Successfully loaded FTTransformerClassifier weights from checkpoint epoch_24.ckpt',
+        module: 'app.ai.forecast_service',
+        message: 'Loaded CrimeGRUForecaster checkpoint (forecast_v1) and %d forecast scopes',
         metadata: { device: 'cpu', num_threads: 8 },
       },
       {
@@ -425,9 +421,9 @@ class SystemService {
         timestamp: '2026-08-03 08:14:02',
         level: 'CRITICAL',
         service: 'MLOps Pipeline',
-        module: 'ai.evaluation.drift_detector',
-        message: 'Concept drift threshold exceeded for feature "weapon_used" (PSI score 0.28 > target 0.20)',
-        metadata: { psi_score: 0.28, feature: 'weapon_used', alert_sent: true },
+        module: 'app.mlops.drift_detector',
+        message: 'Prediction-traffic drift evaluated against the GRU forecast baseline (level: LOW)',
+        metadata: { drift_level: 'LOW', alert_sent: false },
       },
     ];
 
@@ -496,45 +492,18 @@ class SystemService {
       frontend_version: '0.1.0 (Vite + React)',
       backend_version: '1.0.0 (FastAPI + AsyncPG)',
       database_version: 'PostgreSQL 15.4 (Supabase Managed)',
-      ai_model_version: 'FTTransformer v1.0.0 + TabNet v1.1',
-      pytorch_version: 'PyTorch 2.2.0 + Captum 0.7.0',
+      ai_model_version: 'GRU Crime Forecaster forecast_v1',
+      pytorch_version: 'PyTorch (CPU inference)',
       build_hash: 'git-rev-7f49a21e',
       deployed_at: '2026-08-01 04:12:00 UTC',
       deployment_region: 'ap-south-1 (Mumbai)',
       feature_flags: {
-        ENABLE_CAPTUM_XAI: true,
-        ENABLE_BATCH_PREDICTIONS: true,
+        ENABLE_GRU_FORECASTING: true,
         ENABLE_RBAC_ENFORCEMENT: true,
         ENABLE_REALTIME_HEALTH_PROBES: true,
         ENABLE_AUDIT_STREAMING: true,
         MAINTENANCE_MODE: false,
       },
-    };
-  }
-
-  // -------------------------------------------------------------------------
-  // Observability Dashboards
-  // -------------------------------------------------------------------------
-  async getObservabilityMetrics(): Promise<ObservabilityMetrics> {
-    const history = Array.from({ length: 12 }).map((_, idx) => {
-      const h = idx * 2;
-      return {
-        timestamp: `${String(h).padStart(2, '0')}:00`,
-        cpu_usage: Number((20 + Math.sin(idx) * 12 + Math.random() * 5).toFixed(1)),
-        memory_usage: Number((38 + idx * 0.4 + Math.random() * 2).toFixed(1)),
-        qps: Math.round(120 + Math.sin(idx) * 80 + Math.random() * 30),
-        latency_ms: Number((14 + Math.cos(idx) * 6 + Math.random() * 4).toFixed(1)),
-        active_users: Math.round(15 + Math.sin(idx) * 8 + Math.random() * 4),
-        error_count: Math.random() > 0.8 ? 1 : 0,
-      };
-    });
-
-    return {
-      current_qps: 184,
-      avg_p99_latency_ms: 42.5,
-      throughput_rpm: 11040,
-      active_user_connections: 18,
-      history,
     };
   }
 }

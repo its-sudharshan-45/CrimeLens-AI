@@ -27,15 +27,24 @@ export function ModelHealthBadge({ health, loading, className }: ModelHealthBadg
     );
   }
 
-  const loadedCount = Object.values(health.models_loaded).filter(Boolean).length;
-  const totalCount = Object.values(health.models_loaded).length;
-  const isOk = health.status === 'ok' && health.warmup_complete;
-
+  const isOk = health.status === 'ok' && health.loaded;
   const statusConfig = isOk
-    ? { color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20', icon: CheckCircle2, pulse: 'bg-emerald-500', label: 'All Systems Operational' }
-    : { color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20', icon: AlertTriangle, pulse: 'bg-amber-500', label: 'Partial Load' };
+    ? {
+        color: 'text-emerald-400',
+        bg: 'bg-emerald-500/10 border-emerald-500/20',
+        pulse: 'bg-emerald-500',
+        Icon: CheckCircle2,
+        label: 'Forecaster Online',
+      }
+    : {
+        color: 'text-amber-400',
+        bg: 'bg-amber-500/10 border-amber-500/20',
+        pulse: 'bg-amber-500',
+        Icon: AlertTriangle,
+        label: 'Forecaster Offline',
+      };
 
-  const Icon = statusConfig.icon;
+  const { Icon } = statusConfig;
 
   return (
     <div className={cn('flex items-center gap-3 px-3 py-2 rounded-lg border', statusConfig.bg, className)}>
@@ -46,7 +55,7 @@ export function ModelHealthBadge({ health, loading, className }: ModelHealthBadg
       <div className="flex flex-col">
         <span className={cn('text-xs font-semibold', statusConfig.color)}>{statusConfig.label}</span>
         <span className="text-[10px] text-muted-foreground">
-          {loadedCount}/{totalCount} models · {health.device.toUpperCase()} · {health.warmup_complete ? 'Warmup OK' : 'Warming up…'}
+          {health.model_name} · {health.device.toUpperCase()} · {health.n_scopes} scopes
         </span>
       </div>
       <div className="ml-auto flex items-center gap-1">

@@ -16,9 +16,8 @@ import { usePredictionHistory } from '@/hooks/usePredictions';
 
 const PREDICTION_TYPES = [
   { value: '', label: 'All Prediction Types' },
-  { value: 'HOTSPOT', label: 'City Hotspots (CNN)' },
-  { value: 'TREND', label: 'Temporal Forecast (GRU)' },
-  { value: 'SIMILAR_CASE', label: 'Investigation Priorities' },
+  { value: 'HOTSPOT', label: 'City Hotspots (Deprecated)' },
+  { value: 'TREND', label: 'Crime Forecast (GRU)' },
 ];
 
 export function PredictionHistoryView() {
@@ -37,11 +36,9 @@ export function PredictionHistoryView() {
   const getTypeBadge = (type: string) => {
     switch (type.toUpperCase()) {
       case 'HOTSPOT':
-        return <Badge variant="emerald">Hotspot (CNN)</Badge>;
+        return <Badge variant="amber">Hotspot (Deprecated)</Badge>;
       case 'TREND':
-        return <Badge variant="blue">Temporal (GRU)</Badge>;
-      case 'SIMILAR_CASE':
-        return <Badge variant="purple">Investigation Lead</Badge>;
+        return <Badge variant="blue">Crime Forecast (GRU)</Badge>;
       default:
         return <Badge variant="default">{type}</Badge>;
     }
@@ -148,7 +145,7 @@ export function PredictionHistoryView() {
           </div>
           <h3 className="text-sm font-bold text-foreground">No Prediction Records Found</h3>
           <p className="text-xs text-muted-foreground max-w-sm">
-            Run a city hotspot forecast, temporal risk projection, or investigative lead query to populate history.
+            Run a crime-count forecast to populate prediction history.
           </p>
         </Card>
       )}

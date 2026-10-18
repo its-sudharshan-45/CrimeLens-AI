@@ -1,36 +1,27 @@
 import api from '@/lib/api';
 import type {
-  CrimePredictionRequest,
-  CrimePredictionResponse,
   ForecastRequest,
   ForecastResponse,
-  ExplainabilityRequest,
-  ExplainabilityResponse,
-  BatchPredictionResponse,
   ModelHealthResponse,
   ModelMetadataResponse,
+  ScopeListResponse,
+  ScopeType,
 } from '@/types/ai';
 
 const BASE = '/ai';
 
 export const aiService = {
-  async predict(payload: CrimePredictionRequest): Promise<CrimePredictionResponse> {
-    const { data } = await api.post<CrimePredictionResponse>(`${BASE}/predict`, payload);
-    return data;
-  },
-
+  /** 7-day GRU crime-count forecast for a city or crime-type scope. */
   async forecast(payload: ForecastRequest): Promise<ForecastResponse> {
     const { data } = await api.post<ForecastResponse>(`${BASE}/forecast`, payload);
     return data;
   },
 
-  async explain(payload: ExplainabilityRequest): Promise<ExplainabilityResponse> {
-    const { data } = await api.post<ExplainabilityResponse>(`${BASE}/explain`, payload);
-    return data;
-  },
-
-  async batchPredict(records: CrimePredictionRequest[]): Promise<BatchPredictionResponse> {
-    const { data } = await api.post<BatchPredictionResponse>(`${BASE}/batch-predict`, { records });
+  /** Every supported forecasting scope (all cities + all crime types). */
+  async getScopes(scopeType?: ScopeType): Promise<ScopeListResponse> {
+    const { data } = await api.get<ScopeListResponse>(`${BASE}/scopes`, {
+      params: scopeType ? { scope_type: scopeType } : undefined,
+    });
     return data;
   },
 

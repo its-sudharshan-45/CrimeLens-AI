@@ -6,7 +6,7 @@ const brandPoints = [
   {
     icon: Brain,
     title: 'AI-Powered Predictions',
-    description: 'Machine learning models with 94.7% accuracy in crime forecasting.',
+    description: 'Deep learning analytics for crime classification and temporal forecasting.',
   },
   {
     icon: ShieldCheck,

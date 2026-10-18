@@ -1,15 +1,13 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { aiService } from '@/services/aiService';
-import type {
-  CrimePredictionRequest,
-  ForecastRequest,
-  ExplainabilityRequest,
-} from '@/types/ai';
+import type { ForecastRequest, ScopeType } from '@/types/ai';
 
 export const AI_KEYS = {
   health: ['ai', 'health'] as const,
   metadata: ['ai', 'metadata'] as const,
+  scopes: (scopeType?: ScopeType) => ['ai', 'scopes', scopeType ?? 'all'] as const,
+  forecast: (scopeKey?: string) => ['ai', 'forecast', scopeKey ?? 'none'] as const,
 };
 
 /** Live model health – auto-refetches every 30s */
@@ -23,7 +21,7 @@ export function useAIHealth() {
   });
 }
 
-/** Model version metadata – cached for 5 minutes */
+/** Active model metadata – cached for 5 minutes */
 export function useModelMetadata() {
   return useQuery({
     queryKey: AI_KEYS.metadata,
@@ -33,35 +31,31 @@ export function useModelMetadata() {
   });
 }
 
-/** Real-time crime domain prediction mutation */
-export function usePrediction() {
-  return useMutation({
-    mutationFn: (payload: CrimePredictionRequest) => aiService.predict(payload),
-    onError: (e: Error) => toast.error(`Prediction failed: ${e.message}`),
+/** Every selectable forecasting scope, optionally filtered by type. */
+export function useScopes(scopeType?: ScopeType) {
+  return useQuery({
+    queryKey: AI_KEYS.scopes(scopeType),
+    queryFn: () => aiService.getScopes(scopeType),
+    staleTime: 10 * 60_000,
+    retry: 1,
   });
 }
 
-/** N-BEATS crime trend forecast mutation */
-export function useForecast() {
-  return useMutation({
-    mutationFn: (payload: ForecastRequest) => aiService.forecast(payload),
-    onError: (e: Error) => toast.error(`Forecast failed: ${e.message}`),
-  });
-}
-
-/** Captum XAI explainability mutation */
-export function useExplainability() {
-  return useMutation({
-    mutationFn: (payload: ExplainabilityRequest) => aiService.explain(payload),
-    onError: (e: Error) => toast.error(`XAI analysis failed: ${e.message}`),
-  });
-}
-
-/** Batch prediction mutation */
-export function useBatchPredict() {
-  return useMutation({
-    mutationFn: (records: CrimePredictionRequest[]) => aiService.batchPredict(records),
-    onSuccess: (data) => toast.success(`Batch complete: ${data.total_records} records processed`),
-    onError: (e: Error) => toast.error(`Batch prediction failed: ${e.message}`),
+/**
+ * Runs a genuine GRU forecast for the selected scope.
+ * Disabled until a scope type + value are chosen.
+ */
+export function useForecast(params: ForecastRequest | null) {
+  const key = params ? `${params.scope_type}:${params.scope_value}` : undefined;
+  return useQuery({
+    queryKey: AI_KEYS.forecast(key),
+    queryFn: () => aiService.forecast(params as ForecastRequest),
+    enabled: Boolean(params?.scope_type && params?.scope_value),
+    staleTime: 5 * 60_000,
+    retry: 1,
+    throwOnError: (error) => {
+      toast.error(`Forecast failed: ${(error as Error).message}`);
+      return false;
+    },
   });
 }
