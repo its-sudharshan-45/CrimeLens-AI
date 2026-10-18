@@ -1,0 +1,330 @@
+{
+    "versions": [
+        {
+            "model_version": "v1.0.0",
+            "framework": "PyTorch",
+            "training_date": "2026-07-24T20:45:09.991195",
+            "dataset_version": "v1_40160rows",
+            "metrics": {
+                "ft_transformer": {
+                    "model_name": "FTTransformerClassifier",
+                    "accuracy": 0.5715,
+                    "precision": 0.3266,
+                    "recall": 0.5715,
+                    "f1_score": 0.4156,
+                    "roc_auc": 0.4963,
+                    "pr_auc": 0.2501,
+                    "cohen_kappa": 0.0,
+                    "mcc": 0.0,
+                    "confusion_matrix": [
+                        [
+                            0,
+                            383,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            2295,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            191,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            1147,
+                            0,
+                            0
+                        ]
+                    ],
+                    "y_true_len": 4016,
+                    "y_pred_len": 4016,
+                    "y_proba_len": 4016
+                },
+                "residual_mlp": {
+                    "model_name": "ResidualMLPClassifier",
+                    "accuracy": 0.5715,
+                    "precision": 0.3266,
+                    "recall": 0.5715,
+                    "f1_score": 0.4156,
+                    "roc_auc": 0.5045,
+                    "pr_auc": 0.256,
+                    "cohen_kappa": 0.0,
+                    "mcc": 0.0,
+                    "confusion_matrix": [
+                        [
+                            0,
+                            383,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            2295,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            191,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            1147,
+                            0,
+                            0
+                        ]
+                    ],
+                    "y_true_len": 4016,
+                    "y_pred_len": 4016,
+                    "y_proba_len": 4016
+                },
+                "ensemble_classifier": {
+                    "model_name": "EnsembleClassifier",
+                    "accuracy": 0.5715,
+                    "precision": 0.3266,
+                    "recall": 0.5715,
+                    "f1_score": 0.4156,
+                    "roc_auc": 0.5024,
+                    "pr_auc": 0.2518,
+                    "cohen_kappa": 0.0,
+                    "mcc": 0.0,
+                    "confusion_matrix": [
+                        [
+                            0,
+                            383,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            2295,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            191,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            1147,
+                            0,
+                            0
+                        ]
+                    ],
+                    "y_true_len": 4016,
+                    "y_pred_len": 4016,
+                    "y_proba_len": 4016
+                },
+                "nbeats_forecaster": {
+                    "model_name": "NBEATSForecaster",
+                    "mae": 0.9609,
+                    "rmse": 2.9622,
+                    "mape_pct": 48.0,
+                    "smape_pct": 127.48,
+                    "r2_score": 0.9354
+                },
+                "cross_validation_mean": {
+                    "accuracy_mean": 0.5714,
+                    "accuracy_std": 0.0001,
+                    "f1_score_mean": 0.4156,
+                    "f1_score_std": 0.0,
+                    "roc_auc_mean": 0.498
+                }
+            },
+            "artifact_path": "ai/registry\\v1.0.0"
+        },
+        {
+            "model_version": "v1.0.1",
+            "framework": "PyTorch 2.14.0+cpu",
+            "training_date": "2026-10-17T14:29:17.224296+00:00",
+            "dataset_version": "9bb143539b74ecef9274f167603bb490",
+            "metrics": {
+                "ft_transformer": {
+                    "model_name": "FTTransformerClassifier",
+                    "accuracy": 0.5715,
+                    "balanced_accuracy": 0.25,
+                    "precision": 0.3266,
+                    "recall": 0.5715,
+                    "f1_score": 0.4156,
+                    "precision_macro": 0.1429,
+                    "recall_macro": 0.25,
+                    "f1_macro": 0.1818,
+                    "roc_auc": 0.4928,
+                    "pr_auc": 0.2466,
+                    "log_loss": 1.0747,
+                    "cohen_kappa": 0.0,
+                    "mcc": 0.0,
+                    "n_samples": 4016,
+                    "class_labels": [
+                        "Fire Accident",
+                        "Other Crime",
+                        "Traffic Fatality",
+                        "Violent Crime"
+                    ],
+                    "per_class": [
+                        {
+                            "class_index": 0,
+                            "class_name": "Fire Accident",
+                            "precision": 0.0,
+                            "recall": 0.0,
+                            "f1_score": 0.0,
+                            "support": 383
+                        },
+                        {
+                            "class_index": 1,
+                            "class_name": "Other Crime",
+                            "precision": 0.5715,
+                            "recall": 1.0,
+                            "f1_score": 0.7273,
+                            "support": 2295
+                        },
+                        {
+                            "class_index": 2,
+                            "class_name": "Traffic Fatality",
+                            "precision": 0.0,
+                            "recall": 0.0,
+                            "f1_score": 0.0,
+                            "support": 191
+                        },
+                        {
+                            "class_index": 3,
+                            "class_name": "Violent Crime",
+                            "precision": 0.0,
+                            "recall": 0.0,
+                            "f1_score": 0.0,
+                            "support": 1147
+                        }
+                    ],
+                    "confusion_matrix": [
+                        [
+                            0,
+                            383,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            2295,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            191,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            1147,
+                            0,
+                            0
+                        ]
+                    ]
+                },
+                "residual_mlp": {
+                    "model_name": "ResidualMLPClassifier",
+                    "accuracy": 0.5715,
+                    "balanced_accuracy": 0.25,
+                    "precision": 0.3266,
+                    "recall": 0.5715,
+                    "f1_score": 0.4156,
+                    "precision_macro": 0.1429,
+                    "recall_macro": 0.25,
+                    "f1_macro": 0.1818,
+                    "roc_auc": 0.5027,
+                    "pr_auc": 0.2508,
+                    "log_loss": 1.0769,
+                    "cohen_kappa": 0.0,
+                    "mcc": 0.0,
+                    "n_samples": 4016,
+                    "class_labels": [
+                        "Fire Accident",
+                        "Other Crime",
+                        "Traffic Fatality",
+                        "Violent Crime"
+                    ],
+                    "per_class": [
+                        {
+                            "class_index": 0,
+                            "class_name": "Fire Accident",
+                            "precision": 0.0,
+                            "recall": 0.0,
+                            "f1_score": 0.0,
+                            "support": 383
+                        },
+                        {
+                            "class_index": 1,
+                            "class_name": "Other Crime",
+                            "precision": 0.5715,
+                            "recall": 1.0,
+                            "f1_score": 0.7273,
+                            "support": 2295
+                        },
+                        {
+                            "class_index": 2,
+                            "class_name": "Traffic Fatality",
+                            "precision": 0.0,
+                            "recall": 0.0,
+                            "f1_score": 0.0,
+                            "support": 191
+                        },
+                        {
+                            "class_index": 3,
+                            "class_name": "Violent Crime",
+                            "precision": 0.0,
+                            "recall": 0.0,
+                            "f1_score": 0.0,
+                            "support": 1147
+                        }
+                    ],
+                    "confusion_matrix": [
+                        [
+                            0,
+                            383,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            2295,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            191,
+                            0,
+                            0
+                        ],
+                        [
+                            0,
+                            1147,
+                            0,
+                            0
+                        ]
+                    ]
+                },
+                "majority_baseline": {
+                    "model_name": "MajorityClassBaseline",
+                    "majority_class_index": 1,
+                    "majority_class_name": "Other Crime",
+                    "accuracy": 0.5715,
+                    "n_samples": 4016
+                }
+            },
+            "artifact_path": "ai\\registry\\v1.0.1"
+        }
+    ]
+}

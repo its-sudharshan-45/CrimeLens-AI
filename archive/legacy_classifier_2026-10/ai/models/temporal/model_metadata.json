@@ -1,0 +1,59 @@
+{
+  "project": "CrimeLens AI - Phase 3 Temporal Forecasting",
+  "generated_at": "2026-09-04T20:10:47",
+  "random_seed": 42,
+  "input_features": [
+    "total_crimes",
+    "violent_crimes",
+    "other_crimes",
+    "fire_accidents",
+    "traffic_fatalities",
+    "avg_police_deployed",
+    "case_closure_rate",
+    "avg_victim_age",
+    "sin_month",
+    "cos_month",
+    "sin_weekday",
+    "cos_weekday",
+    "is_weekend"
+  ],
+  "n_features": 13,
+  "sequence_length": 30,
+  "forecast_horizon": 7,
+  "date_ranges": {
+    "train": [
+      "2020-01-01",
+      "2022-12-31"
+    ],
+    "validation": [
+      "2023-01-01",
+      "2023-12-31"
+    ],
+    "test": [
+      "2024-01-01",
+      "2024-07-31"
+    ]
+  },
+  "models": {
+    "LSTM": {
+      "checkpoint": "ai/models/temporal\\lstm_best.pt",
+      "best_epoch": 2,
+      "best_val_loss": 3.4225655316602512e-06,
+      "training_time_sec": 4.57,
+      "parameters": 53959,
+      "hidden_size": 64,
+      "num_layers": 2,
+      "dropout": 0.2
+    },
+    "GRU": {
+      "checkpoint": "ai/models/temporal\\gru_best.pt",
+      "best_epoch": 5,
+      "best_val_loss": 3.310074056252256e-06,
+      "training_time_sec": 14.94,
+      "parameters": 40583,
+      "hidden_size": 64,
+      "num_layers": 2,
+      "dropout": 0.2
+    }
+  }
+}
