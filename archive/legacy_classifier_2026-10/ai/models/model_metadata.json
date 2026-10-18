@@ -1,0 +1,12 @@
+{
+    "version": "v1.0.1",
+    "flagship_model": "FTTransformerClassifier",
+    "forecaster_model": "NBEATSForecaster",
+    "dataset_rows": 40160,
+    "saved_at": "2026-10-17T14:29:17.224296+00:00",
+    "dataset_hash_md5": "9bb143539b74ecef9274f167603bb490",
+    "framework": "PyTorch 2.14.0+cpu",
+    "device": "cpu",
+    "seed": 42,
+    "audit_note": "Retrained 2026-10 classifier audit: leakage-free features, fitted StandardScaler, reproducible stratified split, comprehensive metrics."
+}

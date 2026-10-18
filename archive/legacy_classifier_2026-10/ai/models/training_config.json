@@ -1,0 +1,18 @@
+{
+    "input_dim": 26,
+    "num_classes": 4,
+    "d_token": 32,
+    "n_heads": 4,
+    "n_layers": 2,
+    "batch_size": 64,
+    "optimizer": "AdamW",
+    "scheduler": "CosineAnnealingLR",
+    "loss_function": "FocalLoss(gamma=2.0)",
+    "class_weighting": false,
+    "epochs": 30,
+    "patience": 10,
+    "learning_rate": 0.001,
+    "seed": 42,
+    "split": "stratified 80/10/10 (train/val/test), seed-fixed, indices persisted",
+    "feature_scaling": "StandardScaler fitted on training split only"
+}
