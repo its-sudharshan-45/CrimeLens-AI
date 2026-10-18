@@ -1,0 +1,234 @@
+{
+    "dataset_path": "Dataset/crime_dataset_india.csv",
+    "row_count": 40160,
+    "column_count": 14,
+    "columns": [
+        "Report Number",
+        "Date Reported",
+        "Date of Occurrence",
+        "Time of Occurrence",
+        "City",
+        "Crime Code",
+        "Crime Description",
+        "Victim Age",
+        "Victim Gender",
+        "Weapon Used",
+        "Crime Domain",
+        "Police Deployed",
+        "Case Closed",
+        "Date Case Closed"
+    ],
+    "data_types": {
+        "Report Number": "int64",
+        "Date Reported": "object",
+        "Date of Occurrence": "object",
+        "Time of Occurrence": "object",
+        "City": "object",
+        "Crime Code": "int64",
+        "Crime Description": "object",
+        "Victim Age": "int64",
+        "Victim Gender": "object",
+        "Weapon Used": "object",
+        "Crime Domain": "object",
+        "Police Deployed": "int64",
+        "Case Closed": "object",
+        "Date Case Closed": "object"
+    },
+    "missing_values": {
+        "Report Number": 0,
+        "Date Reported": 0,
+        "Date of Occurrence": 0,
+        "Time of Occurrence": 0,
+        "City": 0,
+        "Crime Code": 0,
+        "Crime Description": 0,
+        "Victim Age": 0,
+        "Victim Gender": 0,
+        "Weapon Used": 5790,
+        "Crime Domain": 0,
+        "Police Deployed": 0,
+        "Case Closed": 0,
+        "Date Case Closed": 20098
+    },
+    "duplicate_rows": 0,
+    "numerical_summary": {
+        "Report Number": {
+            "count": 40160.0,
+            "mean": 20080.5,
+            "std": 11593.337741996478,
+            "min": 1.0,
+            "25%": 10040.75,
+            "50%": 20080.5,
+            "75%": 30120.25,
+            "max": 40160.0
+        },
+        "Crime Code": {
+            "count": 40160.0,
+            "mean": 349.36025896414344,
+            "std": 144.16920518761302,
+            "min": 100.0,
+            "25%": 225.0,
+            "50%": 349.0,
+            "75%": 474.0,
+            "max": 599.0
+        },
+        "Victim Age": {
+            "count": 40160.0,
+            "mean": 44.49125996015936,
+            "std": 20.225549651192335,
+            "min": 10.0,
+            "25%": 27.0,
+            "50%": 44.0,
+            "75%": 62.0,
+            "max": 79.0
+        },
+        "Police Deployed": {
+            "count": 40160.0,
+            "mean": 10.00625,
+            "std": 5.467951104969466,
+            "min": 1.0,
+            "25%": 5.0,
+            "50%": 10.0,
+            "75%": 15.0,
+            "max": 19.0
+        }
+    },
+    "outlier_summary": {
+        "Report Number": {
+            "column": "Report Number",
+            "q1": 10040.75,
+            "q3": 30120.25,
+            "iqr": 20079.5,
+            "lower_bound": -20078.5,
+            "upper_bound": 60239.5,
+            "outlier_count": 0,
+            "outlier_percentage": 0.0
+        },
+        "Crime Code": {
+            "column": "Crime Code",
+            "q1": 225.0,
+            "q3": 474.0,
+            "iqr": 249.0,
+            "lower_bound": -148.5,
+            "upper_bound": 847.5,
+            "outlier_count": 0,
+            "outlier_percentage": 0.0
+        },
+        "Victim Age": {
+            "column": "Victim Age",
+            "q1": 27.0,
+            "q3": 62.0,
+            "iqr": 35.0,
+            "lower_bound": -25.5,
+            "upper_bound": 114.5,
+            "outlier_count": 0,
+            "outlier_percentage": 0.0
+        },
+        "Police Deployed": {
+            "column": "Police Deployed",
+            "q1": 5.0,
+            "q3": 15.0,
+            "iqr": 10.0,
+            "lower_bound": -10.0,
+            "upper_bound": 30.0,
+            "outlier_count": 0,
+            "outlier_percentage": 0.0
+        }
+    },
+    "categorical_summary": {
+        "Date Reported": {
+            "unique_count": 25546,
+            "top_categories": {
+                "24-12-2023 13:00": 7,
+                "03-01-2022 20:00": 7,
+                "05-03-2021 13:00": 7,
+                "29-03-2021 22:00": 7,
+                "24-12-2021 18:00": 6
+            }
+        },
+        "Date of Occurrence": {
+            "unique_count": 40160,
+            "top_categories": {
+                "07-30-2024 15:00": 1,
+                "07-30-2024 14:00": 1,
+                "07-30-2024 13:00": 1,
+                "07-30-2024 12:00": 1,
+                "07-30-2024 11:00": 1
+            }
+        },
+        "Time of Occurrence": {
+            "unique_count": 39886,
+            "top_categories": {
+                "14-10-2022 06:54": 3,
+                "11-07-2021 05:55": 2,
+                "12-11-2021 13:21": 2,
+                "30-03-2020 15:10": 2,
+                "11-09-2021 16:04": 2
+            }
+        },
+        "City": {
+            "unique_count": 29,
+            "top_categories": {
+                "Delhi": 5400,
+                "Mumbai": 4415,
+                "Bangalore": 3588,
+                "Hyderabad": 2881,
+                "Kolkata": 2518
+            }
+        },
+        "Crime Description": {
+            "unique_count": 21,
+            "top_categories": {
+                "BURGLARY": 1980,
+                "VANDALISM": 1975,
+                "FRAUD": 1965,
+                "DOMESTIC VIOLENCE": 1932,
+                "FIREARM OFFENSE": 1931
+            }
+        },
+        "Victim Gender": {
+            "unique_count": 3,
+            "top_categories": {
+                "F": 22423,
+                "M": 13405,
+                "X": 4332
+            }
+        },
+        "Weapon Used": {
+            "unique_count": 6,
+            "top_categories": {
+                "Knife": 5835,
+                "Explosives": 5751,
+                "Blunt Object": 5737,
+                "Poison": 5728,
+                "Other": 5676
+            }
+        },
+        "Crime Domain": {
+            "unique_count": 4,
+            "top_categories": {
+                "Other Crime": 22948,
+                "Violent Crime": 11472,
+                "Fire Accident": 3825,
+                "Traffic Fatality": 1915
+            }
+        },
+        "Case Closed": {
+            "unique_count": 2,
+            "top_categories": {
+                "No": 20098,
+                "Yes": 20062
+            }
+        },
+        "Date Case Closed": {
+            "unique_count": 16011,
+            "top_categories": {
+                "04-05-2024 18:00": 6,
+                "20-04-2021 11:00": 6,
+                "20-06-2022 17:00": 5,
+                "11-03-2024 22:00": 5,
+                "12-07-2023 03:00": 5
+            }
+        }
+    }
+}

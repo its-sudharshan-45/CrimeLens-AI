@@ -1,0 +1,238 @@
+{
+    "dataset_path": "D:\\CrimeLens-AI\\datasets\\raw\\crime_dataset_india.csv",
+    "row_count": 40160,
+    "column_count": 14,
+    "columns": [
+        "Report Number",
+        "Date Reported",
+        "Date of Occurrence",
+        "Time of Occurrence",
+        "City",
+        "Crime Code",
+        "Crime Description",
+        "Victim Age",
+        "Victim Gender",
+        "Weapon Used",
+        "Crime Domain",
+        "Police Deployed",
+        "Case Closed",
+        "Date Case Closed"
+    ],
+    "data_types": {
+        "Report Number": "int64",
+        "Date Reported": "object",
+        "Date of Occurrence": "object",
+        "Time of Occurrence": "object",
+        "City": "object",
+        "Crime Code": "int64",
+        "Crime Description": "object",
+        "Victim Age": "int64",
+        "Victim Gender": "object",
+        "Weapon Used": "object",
+        "Crime Domain": "object",
+        "Police Deployed": "int64",
+        "Case Closed": "object",
+        "Date Case Closed": "object"
+    },
+    "missing_values": {
+        "Report Number": 0,
+        "Date Reported": 0,
+        "Date of Occurrence": 0,
+        "Time of Occurrence": 0,
+        "City": 0,
+        "Crime Code": 0,
+        "Crime Description": 0,
+        "Victim Age": 0,
+        "Victim Gender": 0,
+        "Weapon Used": 5790,
+        "Crime Domain": 0,
+        "Police Deployed": 0,
+        "Case Closed": 0,
+        "Date Case Closed": 20098
+    },
+    "duplicate_rows": 0,
+    "date_validation": {
+        "Date Reported": {
+            "format": "%d-%m-%Y %H:%M",
+            "total_non_null": 40160,
+            "successfully_parsed": 40160,
+            "unparseable": 0,
+            "min_date": "2020-01-01 05:00:00",
+            "max_date": "2024-08-02 18:00:00"
+        },
+        "Date of Occurrence": {
+            "format": "%m-%d-%Y %H:%M",
+            "total_non_null": 40160,
+            "successfully_parsed": 40160,
+            "unparseable": 0,
+            "min_date": "2020-01-01 00:00:00",
+            "max_date": "2024-07-31 07:00:00"
+        },
+        "Time of Occurrence": {
+            "format": "%d-%m-%Y %H:%M",
+            "total_non_null": 40160,
+            "successfully_parsed": 40160,
+            "unparseable": 0,
+            "min_date": "2020-01-01 01:11:00",
+            "max_date": "2024-07-31 21:42:00"
+        },
+        "Date Case Closed": {
+            "format": "%d-%m-%Y %H:%M",
+            "total_non_null": 20062,
+            "successfully_parsed": 20062,
+            "unparseable": 0,
+            "min_date": "2020-01-08 21:00:00",
+            "max_date": "2026-07-21 16:00:00"
+        }
+    },
+    "numeric_validation": {
+        "Victim Age": {
+            "min": 10,
+            "max": 79,
+            "mean": 44.49,
+            "std": 20.23,
+            "negative_count": 0,
+            "null_count": 0
+        },
+        "Crime Code": {
+            "min": 100,
+            "max": 599,
+            "mean": 349.36,
+            "std": 144.17,
+            "negative_count": 0,
+            "null_count": 0
+        },
+        "Police Deployed": {
+            "min": 1,
+            "max": 19,
+            "mean": 10.01,
+            "std": 5.47,
+            "negative_count": 0,
+            "null_count": 0
+        }
+    },
+    "cities": {
+        "count": 29,
+        "distribution": {
+            "Delhi": 5400,
+            "Mumbai": 4415,
+            "Bangalore": 3588,
+            "Hyderabad": 2881,
+            "Kolkata": 2518,
+            "Chennai": 2493,
+            "Pune": 2212,
+            "Ahmedabad": 1817,
+            "Jaipur": 1479,
+            "Lucknow": 1456,
+            "Kanpur": 1112,
+            "Surat": 1111,
+            "Nagpur": 1053,
+            "Agra": 764,
+            "Ludhiana": 761,
+            "Visakhapatnam": 728,
+            "Thane": 706,
+            "Ghaziabad": 704,
+            "Indore": 699,
+            "Patna": 695,
+            "Bhopal": 690,
+            "Meerut": 395,
+            "Srinagar": 371,
+            "Nashik": 366,
+            "Vasai": 362,
+            "Varanasi": 355,
+            "Kalyan": 355,
+            "Faridabad": 354,
+            "Rajkot": 320
+        }
+    },
+    "crime_domains": {
+        "count": 4,
+        "distribution": {
+            "Other Crime": 22948,
+            "Violent Crime": 11472,
+            "Fire Accident": 3825,
+            "Traffic Fatality": 1915
+        }
+    },
+    "crime_categories": {
+        "count": 21,
+        "distribution": {
+            "BURGLARY": 1980,
+            "VANDALISM": 1975,
+            "FRAUD": 1965,
+            "DOMESTIC VIOLENCE": 1932,
+            "FIREARM OFFENSE": 1931,
+            "ROBBERY": 1928,
+            "KIDNAPPING": 1920,
+            "IDENTITY THEFT": 1918,
+            "SEXUAL ASSAULT": 1917,
+            "ASSAULT": 1915,
+            "TRAFFIC VIOLATION": 1915,
+            "PUBLIC INTOXICATION": 1912,
+            "HOMICIDE": 1909,
+            "CYBERCRIME": 1899,
+            "ILLEGAL POSSESSION": 1895,
+            "ARSON": 1894,
+            "DRUG OFFENSE": 1890,
+            "EXTORTION": 1873,
+            "COUNTERFEITING": 1871,
+            "VEHICLE - STOLEN": 1862,
+            "SHOPLIFTING": 1859
+        }
+    },
+    "case_closure": {
+        "No": 20098,
+        "Yes": 20062
+    },
+    "weapon_used": {
+        "Knife": 5835,
+        "nan": 5790,
+        "Explosives": 5751,
+        "Blunt Object": 5737,
+        "Poison": 5728,
+        "Other": 5676,
+        "Firearm": 5643
+    },
+    "outlier_summary": {
+        "Report Number": {
+            "column": "Report Number",
+            "q1": 10040.75,
+            "q3": 30120.25,
+            "iqr": 20079.5,
+            "lower_bound": -20078.5,
+            "upper_bound": 60239.5,
+            "outlier_count": 0,
+            "outlier_percentage": 0.0
+        },
+        "Crime Code": {
+            "column": "Crime Code",
+            "q1": 225.0,
+            "q3": 474.0,
+            "iqr": 249.0,
+            "lower_bound": -148.5,
+            "upper_bound": 847.5,
+            "outlier_count": 0,
+            "outlier_percentage": 0.0
+        },
+        "Victim Age": {
+            "column": "Victim Age",
+            "q1": 27.0,
+            "q3": 62.0,
+            "iqr": 35.0,
+            "lower_bound": -25.5,
+            "upper_bound": 114.5,
+            "outlier_count": 0,
+            "outlier_percentage": 0.0
+        },
+        "Police Deployed": {
+            "column": "Police Deployed",
+            "q1": 5.0,
+            "q3": 15.0,
+            "iqr": 10.0,
+            "lower_bound": -10.0,
+            "upper_bound": 30.0,
+            "outlier_count": 0,
+            "outlier_percentage": 0.0
+        }
+    }
+}
