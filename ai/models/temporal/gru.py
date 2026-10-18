@@ -1,12 +1,12 @@
 """
 ai/models/temporal/gru.py
 ==========================
-Standard GRU Time Series Forecaster for CrimeLens AI (Phase 3).
+GRU crime-count forecaster — the single deep-learning model in CrimeLens AI.
 
 Architecture:
-    Input: (batch_size, seq_len=30, input_size=13)
+    Input: (batch_size, seq_len=30, input_size=6)
        ↓
-    GRU(input_size=13, hidden_size=64, num_layers=2, dropout=0.2, batch_first=True)
+    GRU(input_size=6, hidden_size=64, num_layers=2, dropout=0.2, batch_first=True)
        ↓
     Dropout(0.2)
        ↓
@@ -14,12 +14,14 @@ Architecture:
        ↓
     Output: (batch_size, forecast_horizon=7)
 
-Designed for academic comparison against the LSTM model with equivalent capacity.
+The six input features are produced by ``ai.forecasting.data`` (one per-scope
+z-scored daily count plus five calendar features).  Earlier research models
+(LSTM, N-BEATS, FT-Transformer, CNN) were removed and archived.
 """
 
-from typing import Optional
+
 import torch
-import torch.nn as nn
+from torch import nn
 
 
 class CrimeGRUForecaster(nn.Module):
@@ -27,7 +29,7 @@ class CrimeGRUForecaster(nn.Module):
     Standard GRU multi-step crime count forecaster.
 
     Args:
-        input_size: Number of input features per time step (default: 13).
+        input_size: Number of input features per time step (default: 6).
         hidden_size: GRU hidden state dimension (default: 64).
         num_layers: Number of stacked GRU layers (default: 2).
         forecast_horizon: Number of future days to forecast (default: 7).
@@ -36,7 +38,7 @@ class CrimeGRUForecaster(nn.Module):
 
     def __init__(
         self,
-        input_size: int = 13,
+        input_size: int = 6,
         hidden_size: int = 64,
         num_layers: int = 2,
         forecast_horizon: int = 7,
@@ -62,7 +64,7 @@ class CrimeGRUForecaster(nn.Module):
     def forward(
         self,
         x: torch.Tensor,
-        hx: Optional[torch.Tensor] = None,
+        hx: torch.Tensor | None = None,
     ) -> torch.Tensor:
         """
         Forward pass.
