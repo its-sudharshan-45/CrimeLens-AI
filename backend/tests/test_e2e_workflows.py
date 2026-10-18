@@ -10,10 +10,11 @@ Validates the complete operational lifecycle:
   4. Create Investigation linked to Report (Officer)
   5. Add Investigation Notes
   6. Upload Evidence linked to Crime Report
-  7. Run AI Prediction (Hotspot, Temporal Risk, Investigation Lead)
+  7. Run AI Prediction (deprecated Hotspot 410 + GRU 7-day forecast)
   8. Verify complete cryptographic audit trail via GET /api/v1/audit-logs
 """
 
+import os
 from unittest.mock import patch
 import uuid
 import pytest
@@ -24,6 +25,9 @@ from tests.conftest import (
     mock_officer_user,
     mock_investigator_user,
 )
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+FORECAST_CKPT = os.path.join(PROJECT_ROOT, "ai", "registry", "forecast_v1", "gru_forecaster.pt")
 
 
 @pytest.mark.asyncio
@@ -140,21 +144,21 @@ async def test_full_operational_lifecycle(client: AsyncClient, investigator_id: 
         assert evidence_resp.status_code == 200, evidence_resp.text
         assert evidence_resp.json()["file_name"] == "cctv_exterior.jpg"
 
-    # ── Step 7: Run AI Predictions ──────────────────────────────────────────
-    # 7a. Hotspot Forecasting
+    # ── Step 7: Run AI Prediction ───────────────────────────────────────────
+    # 7a. Hotspot Forecasting — DEPRECATED (CNN removed 2026-10-16, tabular data not images)
     hotspot_resp = await client.post("/predict/hotspots", json={"top_n": 5, "crime_type": "Robbery"})
-    assert hotspot_resp.status_code == 200
-    assert len(hotspot_resp.json()["hotspots"]) == 5
+    assert hotspot_resp.status_code == 410
+    assert "removed" in hotspot_resp.json()["detail"].lower()
 
-    # 7b. Temporal Risk Forecasting
-    temporal_resp = await client.post("/predict/temporal-risk", json={"city": "Mumbai"})
-    assert temporal_resp.status_code == 200
-    assert len(temporal_resp.json()["forecast"]) == 7
-
-    # 7c. Investigation Assistant Priorities
-    leads_resp = await client.post("/predict/investigation-leads", json={"city": "Mumbai", "crime_type": "Robbery"})
-    assert leads_resp.status_code == 200
-    assert len(leads_resp.json()["leads"]) >= 3
+    # 7b. GRU crime-count forecast (the single production model). Only asserted when the
+    # trained checkpoint is present so the suite never fabricates a forecast.
+    forecast_ran = os.path.exists(FORECAST_CKPT)
+    if forecast_ran:
+        fc_resp = await client.post(
+            "/api/v1/ai/forecast", json={"scope_type": "city", "scope_value": "Mumbai"}
+        )
+        assert fc_resp.status_code == 200, fc_resp.text
+        assert len(fc_resp.json()["forecast"]) == 7
 
     # ── Step 8: Verify Complete Audit Log Trail ─────────────────────────────
     _set_auth_user(mock_admin_user)
@@ -163,6 +167,7 @@ async def test_full_operational_lifecycle(client: AsyncClient, investigator_id: 
     audit_logs = audit_resp.json()
     assert len(audit_logs) >= 3
 
-    # Verify actions in audit trail
+    # Verify actions in audit trail (a forecast is logged as a PREDICTION when it runs).
     actions_recorded = [log["action"] for log in audit_logs]
-    assert any("PREDICTION" in a for a in actions_recorded), f"Prediction not logged: {actions_recorded}"
+    if forecast_ran:
+        assert any("PREDICTION" in a for a in actions_recorded), f"Prediction not logged: {actions_recorded}"

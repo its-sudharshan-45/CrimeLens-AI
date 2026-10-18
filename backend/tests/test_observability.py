@@ -67,4 +67,6 @@ async def test_prediction_observability_stats_endpoint(client: AsyncClient):
     assert "predictions_by_type" in data
     assert isinstance(data["predictions_by_type"], dict)
     assert "active_models" in data
-    assert len(data["active_models"]) == 5
+    # Single-model project: only the GRU crime-count forecaster is active.
+    assert data["active_models"] == ["CrimeGRUForecaster"]
+    assert "CityHotspotCNN" not in data["active_models"]

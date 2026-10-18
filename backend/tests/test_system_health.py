@@ -6,7 +6,7 @@ Phase 9 System Health, Hardware Resource Metrics & Model Inspection Test Suite.
 Validates:
   1. GET /health status, database connectivity, and hardware metrics.
   2. GET /admin/system-health real metrics via psutil.
-  3. AI model health reporting for all 5 validated deep learning models with real parameter counts.
+  3. AI model health reporting for the single active GRU forecaster with real parameter counts.
 """
 
 import pytest
@@ -52,31 +52,31 @@ async def test_admin_system_health_real_hardware_metrics(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_ai_models_health_inspection_parameter_counts(client: AsyncClient):
-    """Verify all 5 validated PyTorch models are reported with real non-zero parameter counts."""
+    """Verify the single GRU forecaster is reported with real parameter counts when loaded."""
     resp = await client.get("/admin/system-health")
     assert resp.status_code == 200
 
     data = resp.json()
     models = data["ai_models"]
-    assert len(models) == 5
+    assert len(models) == 1
 
+    model = models[0]
+    assert model["model_name"] == "CrimeGRUForecaster"
     model_names = [m["model_name"] for m in models]
-    expected_models = [
-        "CrimeGRUForecaster",
-        "CityHotspotCNN",
-        "FTTransformerClassifier",
-        "NBEATSForecaster",
-        "CrimeEmbeddingNetwork",
-    ]
-    for expected in expected_models:
-        assert expected in model_names, f"Model {expected} missing from health response: {model_names}"
+    assert "CityHotspotCNN" not in model_names
+    # Legacy classifiers/forecasters were removed with the single-model simplification.
+    for removed in ("FTTransformerClassifier", "NBEATSForecaster", "CrimeEmbeddingNetwork", "EnsembleClassifier"):
+        assert removed not in model_names
 
-    # Verify each model has real positive parameter count and inference available
-    for m in models:
-        assert m["parameter_count"] > 0, f"Model {m['model_name']} has invalid param count: {m['parameter_count']}"
-        assert m["inference_available"] is True
-        assert m["version"] == "v1.0.0"
+    from app.core.paths import read_active_forecast_version
 
-    # Total parameters across models exceeds 2 million
-    total_params = data["total_model_parameters"]
-    assert total_params > 2_000_000, f"Expected >2M total parameters, got: {total_params}"
+    active_version = read_active_forecast_version()
+    assert model["version"] == active_version
+
+    if model["inference_available"]:
+        assert model["parameter_count"] > 0
+        assert model["loaded"] is True
+        assert data["total_model_parameters"] == model["parameter_count"]
+    else:
+        # No trained checkpoint present in this environment — reported honestly.
+        pytest.skip("GRU forecaster checkpoint not loaded; parameter counts unavailable")
