@@ -1,61 +1,40 @@
-import { useQuery } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { aiService } from '@/services/aiService';
-import type { ForecastRequest, ScopeType } from '@/types/ai';
+import type { RiskPredictionRequest } from '@/types/ai';
 
 export const AI_KEYS = {
   health: ['ai', 'health'] as const,
-  metadata: ['ai', 'metadata'] as const,
-  scopes: (scopeType?: ScopeType) => ['ai', 'scopes', scopeType ?? 'all'] as const,
-  forecast: (scopeKey?: string) => ['ai', 'forecast', scopeKey ?? 'none'] as const,
+  locations: ['ai', 'locations'] as const,
 };
 
-/** Live model health – auto-refetches every 30s */
+/** Model availability. Auto-refreshes every 60 seconds. */
 export function useAIHealth() {
   return useQuery({
     queryKey: AI_KEYS.health,
-    queryFn: () => aiService.getHealthStatus(),
+    queryFn: () => aiService.getHealth(),
     staleTime: 30_000,
-    refetchInterval: 30_000,
+    refetchInterval: 60_000,
     retry: 1,
   });
 }
 
-/** Active model metadata – cached for 5 minutes */
-export function useModelMetadata() {
+/** State/district catalog. Cached for ten minutes because it is static. */
+export function useLocations() {
   return useQuery({
-    queryKey: AI_KEYS.metadata,
-    queryFn: () => aiService.getModelMetadata(),
-    staleTime: 5 * 60_000,
-    retry: 1,
-  });
-}
-
-/** Every selectable forecasting scope, optionally filtered by type. */
-export function useScopes(scopeType?: ScopeType) {
-  return useQuery({
-    queryKey: AI_KEYS.scopes(scopeType),
-    queryFn: () => aiService.getScopes(scopeType),
+    queryKey: AI_KEYS.locations,
+    queryFn: () => aiService.getLocations(),
     staleTime: 10 * 60_000,
     retry: 1,
   });
 }
 
 /**
- * Runs a genuine GRU forecast for the selected scope.
- * Disabled until a scope type + value are chosen.
+ * Runs a prediction only when the user submits the form. This keeps the page
+ * deterministic: selecting a dropdown does not silently fire model requests.
  */
-export function useForecast(params: ForecastRequest | null) {
-  const key = params ? `${params.scope_type}:${params.scope_value}` : undefined;
-  return useQuery({
-    queryKey: AI_KEYS.forecast(key),
-    queryFn: () => aiService.forecast(params as ForecastRequest),
-    enabled: Boolean(params?.scope_type && params?.scope_value),
-    staleTime: 5 * 60_000,
-    retry: 1,
-    throwOnError: (error) => {
-      toast.error(`Forecast failed: ${(error as Error).message}`);
-      return false;
-    },
+export function useRiskPrediction() {
+  return useMutation({
+    mutationKey: ['ai', 'risk'],
+    mutationFn: (payload: RiskPredictionRequest) => aiService.predictRisk(payload),
   });
 }

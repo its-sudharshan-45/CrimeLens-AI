@@ -1,36 +1,28 @@
 import api from '@/lib/api';
 import type {
-  ForecastRequest,
-  ForecastResponse,
+  LocationCatalogResponse,
   ModelHealthResponse,
-  ModelMetadataResponse,
-  ScopeListResponse,
-  ScopeType,
+  RiskPredictionRequest,
+  RiskPredictionResponse,
 } from '@/types/ai';
 
 const BASE = '/ai';
 
 export const aiService = {
-  /** 7-day GRU crime-count forecast for a city or crime-type scope. */
-  async forecast(payload: ForecastRequest): Promise<ForecastResponse> {
-    const { data } = await api.post<ForecastResponse>(`${BASE}/forecast`, payload);
+  /** State -> district catalog backed by the trained model's city scopes. */
+  async getLocations(): Promise<LocationCatalogResponse> {
+    const { data } = await api.get<LocationCatalogResponse>(`${BASE}/locations`);
     return data;
   },
 
-  /** Every supported forecasting scope (all cities + all crime types). */
-  async getScopes(scopeType?: ScopeType): Promise<ScopeListResponse> {
-    const { data } = await api.get<ScopeListResponse>(`${BASE}/scopes`, {
-      params: scopeType ? { scope_type: scopeType } : undefined,
-    });
+  /** Run a genuine district risk prediction from the trained GRU forecast. */
+  async predictRisk(payload: RiskPredictionRequest): Promise<RiskPredictionResponse> {
+    const { data } = await api.post<RiskPredictionResponse>(`${BASE}/risk`, payload);
     return data;
   },
 
-  async getModelMetadata(): Promise<ModelMetadataResponse> {
-    const { data } = await api.get<ModelMetadataResponse>(`${BASE}/models`);
-    return data;
-  },
-
-  async getHealthStatus(): Promise<ModelHealthResponse> {
+  /** Model load status (used for a small availability badge). */
+  async getHealth(): Promise<ModelHealthResponse> {
     const { data } = await api.get<ModelHealthResponse>(`${BASE}/health`);
     return data;
   },
