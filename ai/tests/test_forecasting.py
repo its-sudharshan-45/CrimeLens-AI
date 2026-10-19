@@ -229,6 +229,45 @@ def test_predictor_serves_genuine_forecast():
 
 
 @pytest.mark.skipif(not os.path.exists(FORECAST_CKPT), reason="trained forecaster checkpoint missing")
+def test_predict_horizon_is_the_forecast_source():
+    """The risk ranking must reuse the exact same inference path as /forecast."""
+    from ai.forecasting.predict import CrimeForecastPredictor
+
+    predictor = CrimeForecastPredictor()
+    city = next(s for s in predictor.available_scopes() if s["scope_type"] == "city")
+    horizon = predictor.predict_horizon(city["key"])
+    result = predictor.forecast(city["key"])
+
+    assert len(horizon) == fdata.FORECAST_HORIZON
+    # The API rounds display values to two decimals; the source values match.
+    assert horizon == pytest.approx([day["predicted_count"] for day in result["forecast"]], abs=0.01)
+    history = predictor.historical_summary(city["key"])
+    assert history["total_incidents"] > 0
+    assert history["last_observed_date"] == fdata.DATE_END
+
+
+def test_location_catalog_covers_every_dataset_city():
+    """State/district dropdowns must mirror the dataset's 29 city scopes."""
+    from ai.forecasting.locations import CITY_GEO, build_location_catalog, resolve_location
+
+    assert len(CITY_GEO) == 29
+    catalog = build_location_catalog()
+    assert len(catalog) == 15
+    assert sum(len(state["districts"]) for state in catalog) == 29
+
+    # District labels are unique within each state (Thane / Thane (Kalyan)).
+    for state in catalog:
+        labels = [district["district"] for district in state["districts"]]
+        assert len(labels) == len(set(labels)), state["state"]
+
+    delhi = resolve_location("Delhi", "New Delhi")
+    assert delhi is not None
+    assert delhi["city"] == "Delhi"
+    assert resolve_location("delhi", "new delhi") == delhi
+    assert resolve_location("Delhi", "Mumbai") is None
+
+
+@pytest.mark.skipif(not os.path.exists(FORECAST_CKPT), reason="trained forecaster checkpoint missing")
 def test_saved_metrics_are_internally_consistent():
     import json
 

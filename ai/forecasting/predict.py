@@ -156,15 +156,17 @@ class CrimeForecastPredictor:
         self._backtest_cache[scope_key] = rows
         return rows
 
-    def forecast(self, scope_key: str, history_days: int = 30) -> dict[str, Any]:
+    def predict_horizon(self, scope_key: str) -> list[float]:
+        """Run the trained GRU once and return the next ``forecast_horizon`` counts.
+
+        This is the single inference path used by both the full forecast and the
+        district risk ranking, so every number comes from the same model call.
+        """
         if not self.scope_exists(scope_key):
             raise KeyError(f"Unsupported scope '{scope_key}'.")
 
-        meta = self.scope_series[scope_key]
-        counts = self._counts(scope_key)
         mean, std = self._stats(scope_key)
         feats = self._features(scope_key)
-
         if len(feats) < self.seq_len:
             raise ValueError(f"Scope '{scope_key}' has insufficient history ({len(feats)} < {self.seq_len}).")
 
@@ -172,6 +174,30 @@ class CrimeForecastPredictor:
         with torch.no_grad():
             pred_z = self.model(x).cpu().numpy()[0]
         pred = np.clip(pred_z * std + mean, 0.0, None)
+        return [float(value) for value in pred]
+
+    def historical_summary(self, scope_key: str) -> dict[str, Any]:
+        """Observed-history facts for a scope, taken directly from the dataset."""
+        if not self.scope_exists(scope_key):
+            raise KeyError(f"Unsupported scope '{scope_key}'.")
+        counts = self._counts(scope_key)
+        mean, std = self._stats(scope_key)
+        return {
+            "total_incidents": int(round(float(counts.sum()))),
+            "daily_average": round(float(counts.mean()), 3),
+            "train_mean": round(mean, 3),
+            "train_std": round(std, 3),
+            "first_observed_date": self.dates[0].date().isoformat(),
+            "last_observed_date": self.dates[-1].date().isoformat(),
+        }
+
+    def forecast(self, scope_key: str, history_days: int = 30) -> dict[str, Any]:
+        if not self.scope_exists(scope_key):
+            raise KeyError(f"Unsupported scope '{scope_key}'.")
+
+        meta = self.scope_series[scope_key]
+        counts = self._counts(scope_key)
+        pred = self.predict_horizon(scope_key)
 
         last_date = self.dates[-1]
         margin = 1.96 * self.residual_sigma
