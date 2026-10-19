@@ -11,7 +11,7 @@ with their endpoints.
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class ScopeInfo(BaseModel):
@@ -76,6 +76,78 @@ class ForecastResponse(BaseModel):
     test_metrics: Dict[str, Any] = Field(default_factory=dict)
     per_horizon_metrics: Dict[str, Any] = Field(default_factory=dict)
     evaluation_summary: Dict[str, Any] = Field(default_factory=dict)
+    uncertainty_method: Optional[str] = None
+    disclaimer: str
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class DistrictLocation(BaseModel):
+    """A selectable district backed by one city-level model scope."""
+
+    district: str = Field(..., description="Display name shown in the District dropdown")
+    city: str = Field(..., description="City value used by the trained model, e.g. 'Delhi'")
+    scope_key: str = Field(..., description="Model scope key, e.g. 'city:Delhi'")
+
+
+class StateLocations(BaseModel):
+    state: str
+    districts: List[DistrictLocation]
+
+
+class LocationCatalogResponse(BaseModel):
+    """State -> district catalog derived from the dataset and model scopes."""
+
+    states: List[StateLocations]
+    district_count: int
+    state_count: int
+
+
+class RiskPredictionRequest(BaseModel):
+    """Select a state and district; the backend resolves the model scope."""
+
+    state: str = Field(..., min_length=1, max_length=100, description="Indian state, e.g. 'Delhi'")
+    district: str = Field(..., min_length=1, max_length=100, description="District label, e.g. 'New Delhi'")
+
+    @field_validator("state", "district")
+    @classmethod
+    def strip_and_require(cls, value: str) -> str:
+        cleaned = value.strip()
+        if not cleaned:
+            raise ValueError("must not be blank")
+        return cleaned
+
+    model_config = ConfigDict(
+        json_schema_extra={"example": {"state": "Delhi", "district": "New Delhi"}}
+    )
+
+
+class RiskPredictionResponse(BaseModel):
+    """District risk result derived from a genuine GRU forecast."""
+
+    success: bool = True
+    state: str
+    district: str
+    city: str
+    scope_key: str
+    risk_percentage: float = Field(..., ge=0.0, le=100.0)
+    risk_category: Literal["Low", "Medium", "High"]
+    risk_lower_bound: float = Field(..., ge=0.0, le=100.0)
+    risk_upper_bound: float = Field(..., ge=0.0, le=100.0)
+    risk_method: str
+    predicted_daily_average: float = Field(..., ge=0.0)
+    predicted_7_day_total: float = Field(..., ge=0.0)
+    prediction_interval_95: Dict[str, float]
+    peak_predicted_daily_average: float = Field(..., ge=0.0)
+    district_rank: Optional[int] = None
+    district_count: int = Field(..., ge=0)
+    historical_incidents: int = Field(..., ge=0)
+    historical_daily_average: float = Field(..., ge=0.0)
+    last_observed_date: str
+    model_name: str = "CrimeGRUForecaster"
+    model_version: str
+    model_test_metrics: Dict[str, Any] = Field(default_factory=dict)
+    persistence_test_metrics: Dict[str, Any] = Field(default_factory=dict)
+    forecast: List[ForecastDay]
     uncertainty_method: Optional[str] = None
     disclaimer: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
