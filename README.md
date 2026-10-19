@@ -1,118 +1,169 @@
 # CrimeLens AI
 
-CrimeLens AI is a full-stack crime intelligence platform for exploring, managing, and analyzing Indian crime incident data. It combines a React dashboard, a FastAPI backend on Supabase PostgreSQL, and a single PyTorch **GRU** model that forecasts daily crime counts.
+CrimeLens AI is a focused, full-stack **district crime risk prediction** application. It uses a
+trained PyTorch **GRU** model and a real Indian crime-incident dataset to estimate near-term
+incident volume for a selected state and district.
+
+The dashboard intentionally exposes **one workflow**: choose a location, run the model, and read
+the resulting risk index. Authentication, the dataset, and the trained model are preserved.
 
 ---
 
-## Implemented Features
+## What the application does
 
-### Crime data management
-- **Crime reports** — browse, search, filter, and manage incident records (imported from `Dataset/crime_dataset_india.csv`: 40,160 records, 29 cities, 21 crime types)
-- **Categories & locations** — maintain crime categories and geographic locations tied to reports
-- **Investigations** — create and track investigations linked to reports, with status workflow (`OPEN`, `UNDER_INVESTIGATION`, `WAITING_FOR_EVIDENCE`, `CLOSED`, etc.)
-- **Evidence** — upload and manage case evidence files (images, PDF, video) with Supabase storage and audit trails
+1. The user selects a **state** and then a **district**.
+2. The backend maps that district to the dataset's city scope and runs the trained GRU
+   forecaster for a **7-day horizon**.
+3. The UI displays:
+   - a relative **crime risk percentage**,
+   - a **Low / Medium / High** risk category,
+   - a visual risk gauge,
+   - predicted daily incidents and the 7-day total,
+   - a concise forecast summary with model provenance.
 
-### Authentication & security
-- **Supabase Auth** on the frontend — sign up, login, email verification, forgot/reset password
-- **JWT verification** on the backend — ES256/RS256 via Supabase JWKS
-- **Protected API routes** — authenticated access to dashboard data and AI endpoints
-- **Audit logging** — searchable audit center for system and user actions
-- **Security dashboard** — security-focused monitoring views
+### Dataset coverage
 
-### AI & predictions
-The project ships **one** working deep-learning model: a pooled PyTorch **GRU** that forecasts the
-next 7 days of daily crime counts for any supported *scope* (a city or a crime type).
+| Item | Value |
+|------|-------|
+| Source | `Dataset/crime_dataset_india.csv` |
+| Incidents | 40,160 raw records |
+| Dataset cities | 29 |
+| States | 15 |
+| Districts | 29 (distinct labels) |
+| Crime types | 21 |
+| Raw date range | 2020-01-01 → 2023-12-31 |
 
-- **7-day crime-count forecast** — `POST /api/v1/ai/forecast` returns a genuine forward forecast,
-  the historical series, empirical 95% prediction intervals, an honest held-out backtest
-  (actual-vs-predicted), and evaluation metrics compared against a **persistence baseline**.
-- **Supported scopes** — `GET /api/v1/ai/scopes` lists all cities and crime types.
-- **Model metadata** — `GET /api/v1/ai/models` exposes the active version, dataset hash, architecture
-  and held-out metrics; `GET /api/v1/ai/health` reports load status.
-- **Prediction history** — every forecast is persisted with full lineage; browse it at
-  `GET /predict/history`, with aggregate observability at `GET /predict/stats`.
-- **City hotspot ranking (DEPRECATED)** — the Phase 4 2D-CNN was removed 2026-10-16 (the data is
-  tabular, not images); `POST /predict/hotspots` now returns **410 Gone** and historical records
-  remain queryable via `GET /predict/history`.
+The dataset contains a **City** column, not state/district columns. The authoritative
+city → state → district mapping lives in `ai/forecasting/locations.py` (`CITY_GEO`) and is shared
+by model serving and dataset normalization.
 
-#### Honest model-quality note (2026-10)
+### Risk methodology
 
-The bundled dataset is synthetic and balanced (exactly 24 incidents/day), so city- and type-level
-daily counts are close to white noise. The GRU is therefore expected to beat the persistence
-baseline only modestly, and the reported metrics reflect that.
+The risk value is a **Relative Crime Risk Index**, not a probability of crime:
 
-- Metrics (MAE, RMSE, WAPE, R²) are computed on an **untouched chronological test split**
-  (train 2020-01-01→2022-12-31, validation 2023, test 2024-01-01→2024-07-30) and are **never hardcoded**.
-- Per-scope normalisation statistics are fitted on the **training window only** — no leakage.
-- If the model did not beat the baseline, the API reports that honestly rather than hiding it.
-- The dataset dates are stored as **MM-DD-YYYY**; earlier code parsed them day-first, which was a bug.
-- Retraining is reproducible: `python -m ai.forecasting.train --epochs 60` records the seed, split
-  boundaries, feature schema, dataset hash and full evaluation results.
+```
+risk_percentage = district predicted average daily incidents
+                / highest predicted district average daily incidents
+                × 100
+```
 
-### MLOps & observability
-- **Model registry** — single-version metadata in `ai/registry/forecast_v1/`, active version in `forecast_active.json`
-- **Analytics dashboard** — prediction distribution, daily trends, latency metrics
-- **Drift detection** — data drift status and reports
-- **System health** — API and AI subsystem health checks, model load status
-- **Backup & recovery** — create, list, and restore database snapshots
+Categories:
 
-### Frontend dashboard
-| Page | Purpose |
-|------|---------|
-| Dashboard | Overview and quick navigation |
-| Crime Reports | Incident list and detail management |
-| Categories / Locations | Reference data management |
-| Investigations | Case workflow tracking |
-| Evidence | File upload and review |
-| AI Predictions | 7-day GRU crime-count forecasts, evaluation metrics, prediction history |
-| Analytics | MLOps metrics, drift, model versions |
-| Audit Center | Audit log search and review |
-| Security / System Health / Backups | Operations and admin tooling |
+| Category | Index |
+|----------|-------|
+| High | ≥ 70% |
+| Medium | ≥ 40% and < 70% |
+| Low | < 40% |
 
-### Data pipeline scripts
-- `backend/scripts/dataset_normalizer.py` — normalize CSV into DB-ready records
-- `backend/scripts/import_crime_dataset.py` — idempotent import into PostgreSQL
-- `backend/scripts/import_investigations_from_dataset.py` — seed open investigations from CSV
-- `backend/scripts/verify_dataset_import.py` — integrity checks after import
+All district averages are produced by the same trained GRU in one ranking pass, so scores are
+directly comparable across the 29 districts. The API also returns the 95% prediction interval
+and the district rank by predicted daily incident volume.
+
+### Model
+
+- Architecture: pooled **GRU** forecaster (`CrimeGRUForecaster`, PyTorch)
+- Registry: `ai/registry/forecast_v1/gru_forecaster.pt`
+- Horizon: 7 days, input window: 30 days
+- Held-out test results (chronological split, never hard-coded):
+
+| Metric | GRU model | Persistence baseline |
+|--------|-----------|----------------------|
+| MAE | 0.6933 | 0.9345 |
+| RMSE | 0.9656 | 1.3536 |
+| WAPE | 0.7221 | 0.9734 |
+
+> The dataset is synthetic and balanced (about 24 incidents/day overall), so city-level daily
+> counts are close to white noise. The GRU beats the persistence baseline on MAE, but the
+> absolute improvement is modest. The application reports measured metrics only.
 
 ---
 
-## Tech Stack
+## Tech stack
 
 | Layer | Technologies |
 |-------|----------------|
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS, TanStack Query, Recharts |
-| Backend | FastAPI, SQLAlchemy 2.0 (async), Pydantic v2, Alembic |
-| Database & Auth | Supabase PostgreSQL, Supabase Auth, JWT (JWKS) |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS, TanStack Query |
+| Backend | FastAPI, Pydantic v2, SQLAlchemy 2.0 (async) |
+| Database & Auth | Supabase PostgreSQL + Supabase Auth (JWT) |
 | AI | PyTorch (GRU forecaster), NumPy, model registry |
-| Testing | Pytest (backend + AI), Vitest, TypeScript build |
+| Testing | Pytest, Vitest, TypeScript build |
 
 ---
 
-## Project Structure
+## API endpoints
+
+All routes are under `/api/v1`.
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| `GET` | `/ai/locations` | State → district catalog backed by model scopes |
+| `POST` | `/ai/risk` | Run a district risk prediction from the trained GRU |
+| `GET` | `/ai/health` | Model load status and supported scope count |
+| `GET` | `/ai/scopes` | List supported city / crime-type scopes |
+| `POST` | `/ai/forecast` | Raw 7-day forecast for a scope |
+| `GET` | `/ai/models` | Active model metadata and held-out metrics |
+
+Example request:
+
+```http
+POST /api/v1/ai/risk
+Content-Type: application/json
+
+{
+  "state": "Delhi",
+  "district": "New Delhi"
+}
+```
+
+The response includes `risk_percentage`, `risk_category`, `predicted_daily_average`,
+`prediction_interval_95`, `district_rank`, `forecast` (7 days), model test metrics, and a
+disclaimer. Invalid locations return `404`; an unavailable model returns `503`.
+
+Frontend routes:
+
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page |
+| `/login`, `/signup`, `/forgot-password` | Supabase authentication |
+| `/verify-email`, `/reset-password` | Auth callbacks |
+| `/dashboard` | Protected risk prediction page |
+
+Removed dashboard paths such as `/dashboard/reports` redirect to `/dashboard`.
+
+---
+
+## Project structure
 
 ```
 CrimeLens-AI/
-├── ai/                  # GRU forecaster (ai/forecasting/), registry, tests; legacy stack in archive/
-├── backend/             # FastAPI app, services, API routes, DB models, scripts
-├── Dataset/             # Source CSV (crime_dataset_india.csv)
-├── frontend/            # React SPA
-├── docker-compose.yml   # Local backend + frontend containers
+├── ai/
+│   ├── forecasting/          # GRU model, predictor, shared location catalog
+│   └── registry/forecast_v1/ # Checkpoint, metrics, scope series
+├── backend/
+│   ├── app/
+│   │   ├── ai/forecast_service.py
+│   │   ├── api/v1/ai.py
+│   │   └── schemas/ai.py
+│   └── tests/
+├── Dataset/                  # Source CSV
+├── frontend/
+│   ├── src/pages/dashboard/RiskPredictionPage.tsx
+│   ├── src/hooks/useAI.ts
+│   └── src/services/aiService.ts
 └── README.md
 ```
 
 ---
 
-## Getting Started
+## Getting started
 
 ### Prerequisites
+
 - Python 3.11+
 - Node.js 18+
-- Supabase project (PostgreSQL + Auth)
+- A Supabase project (PostgreSQL + Auth)
 
 ### 1. Environment setup
-
-Copy templates and fill in your Supabase credentials:
 
 ```powershell
 copy .env.example .env
@@ -120,18 +171,20 @@ copy backend\.env.example backend\.env
 copy frontend\.env.example frontend\.env
 ```
 
-### 2. Train the AI model
+Fill in the Supabase credentials in both `.env` files. The frontend uses
+`VITE_API_URL` (default `http://localhost:8000/api/v1`).
 
-The GRU forecaster must be trained once before the backend can serve forecasts:
+### 2. Model
+
+The trained artifacts should already exist in `ai/registry/forecast_v1/`. If the checkpoint is
+missing, retrain reproducibly from the repository root:
 
 ```powershell
-# From the repository root
 .venv\Scripts\python.exe -m ai.forecasting.train --epochs 60
 ```
 
-This writes a checkpoint and honest evaluation artifacts to `ai/registry/forecast_v1/`
-(metrics, plots, scope series). If you skip this step, the forecast endpoints return a clear
-"model not loaded" response instead of fabricating numbers.
+If the model cannot be loaded, the dashboard shows “Model unavailable” and prediction requests
+return a clear `503` error instead of fabricated results.
 
 ### 3. Backend
 
@@ -139,11 +192,6 @@ This writes a checkpoint and honest evaluation artifacts to `ai/registry/forecas
 cd backend
 python -m venv .venv
 .venv\Scripts\pip install -e .
-
-# Run migrations, then import dataset (from repo root)
-python -m backend.scripts.import_crime_dataset
-
-# Start API server
 .venv\Scripts\uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
@@ -159,24 +207,23 @@ npm run dev
 
 App: `http://localhost:5173`
 
-### 5. Run tests
+### 5. Tests
 
 ```powershell
-backend\.venv\Scripts\python.exe -m pytest backend/tests/ -q
-backend\.venv\Scripts\python.exe -m pytest ai/tests/ -q
-cd frontend && npm run build && npm run test
+backend\.venv\Scripts\python.exe -m pytest backend/tests/test_risk_prediction.py backend/tests/test_ai_forecasting.py -q
+.venv\Scripts\python.exe -m pytest ai/tests/test_forecasting.py -q
+cd frontend
+npm run build
+npm test
 ```
-
-> **Note:** Trained model weights (`.pt` files) are not committed to git. Regenerate them
-> reproducibly from the repository root with `python -m ai.forecasting.train --epochs 60`
-> (writes `ai/registry/forecast_v1/`) before starting the backend, or copy a
-> `gru_forecaster.pt` checkpoint into `ai/registry/forecast_v1/`.
 
 ---
 
-## Responsible Use
+## Responsible use
 
-CrimeLens AI is a **decision-support tool** for resource planning and spatial/temporal pattern analysis — not individual criminal profiling. All AI outputs include confidence scores and disclaimers; human verification is required before operational use.
+CrimeLens AI is a **decision-support tool**. The relative risk index summarizes predicted
+incident volume for a district; it is **not** a probability that a crime will occur and must
+not be used for individual profiling. Human review is required before any operational use.
 
 ---
 
