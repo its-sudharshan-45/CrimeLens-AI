@@ -246,24 +246,54 @@ def test_predict_horizon_is_the_forecast_source():
     assert history["last_observed_date"] == fdata.DATE_END
 
 
-def test_location_catalog_covers_every_dataset_city():
-    """State/district dropdowns must mirror the dataset's 29 city scopes."""
+def test_location_catalog_covers_all_indian_states_and_districts():
+    """State/district dropdowns must offer the complete official catalogue."""
+    from ai.forecasting.india_locations import (
+        INDIA_STATE_DISTRICTS,
+        INDIA_STATES,
+        TOTAL_DISTRICTS,
+    )
     from ai.forecasting.locations import CITY_GEO, build_location_catalog, resolve_location
 
+    # All 28 States + 8 Union Territories, and every recognised district.
+    assert len(INDIA_STATES) == 36
+    assert TOTAL_DISTRICTS == sum(len(v) for v in INDIA_STATE_DISTRICTS.values())
     assert len(CITY_GEO) == 29
-    catalog = build_location_catalog()
-    assert len(catalog) == 15
-    assert sum(len(state["districts"]) for state in catalog) == 29
 
-    # District labels are unique within each state (Thane / Thane (Kalyan)).
+    catalog = build_location_catalog()
+    assert len(catalog) == 36
+    assert sum(len(state["districts"]) for state in catalog) == TOTAL_DISTRICTS
+
+    # Tamil Nadu is the canonical completeness check: 38 districts.
+    tamil_nadu = next(state for state in catalog if state["state"] == "Tamil Nadu")
+    assert len(tamil_nadu["districts"]) == 38
+    assert "Chennai" in {district["district"] for district in tamil_nadu["districts"]}
+
+    # No duplicate district labels inside a state.
     for state in catalog:
         labels = [district["district"] for district in state["districts"]]
         assert len(labels) == len(set(labels)), state["state"]
 
+    # Every district points at a real model scope; dataset cities are direct.
+    for state in catalog:
+        for district in state["districts"]:
+            assert district["scope_key"].startswith("city:")
+            assert district["coverage"] in {"dataset", "proxy"}
+            assert district["model_supported"] is (district["coverage"] == "dataset")
+
     delhi = resolve_location("Delhi", "New Delhi")
     assert delhi is not None
     assert delhi["city"] == "Delhi"
+    assert delhi["coverage"] == "dataset"
     assert resolve_location("delhi", "new delhi") == delhi
+
+    # An unsupported district is still selectable, through a labelled proxy.
+    coimbatore = resolve_location("Tamil Nadu", "Coimbatore")
+    assert coimbatore is not None
+    assert coimbatore["city"] == "Chennai"
+    assert coimbatore["coverage"] == "proxy"
+    assert coimbatore["model_supported"] is False
+
     assert resolve_location("Delhi", "Mumbai") is None
 
 

@@ -82,11 +82,22 @@ class ForecastResponse(BaseModel):
 
 
 class DistrictLocation(BaseModel):
-    """A selectable district backed by one city-level model scope."""
+    """A selectable district and the real model scope that backs it."""
 
     district: str = Field(..., description="Display name shown in the District dropdown")
-    city: str = Field(..., description="City value used by the trained model, e.g. 'Delhi'")
+    city: str = Field(..., description="Dataset city whose trained scope is used, e.g. 'Delhi'")
     scope_key: str = Field(..., description="Model scope key, e.g. 'city:Delhi'")
+    model_supported: bool = Field(
+        True,
+        description=(
+            "True when this district is one of the dataset's city scopes. "
+            "False when the district is served by a representative (proxy) scope."
+        ),
+    )
+    coverage: Literal["dataset", "proxy"] = Field(
+        "dataset",
+        description="'dataset' for a direct scope, 'proxy' for a representative scope.",
+    )
 
 
 class StateLocations(BaseModel):
@@ -95,11 +106,15 @@ class StateLocations(BaseModel):
 
 
 class LocationCatalogResponse(BaseModel):
-    """State -> district catalog derived from the dataset and model scopes."""
+    """Complete State/UT -> district catalog plus model-coverage metadata."""
 
     states: List[StateLocations]
-    district_count: int
-    state_count: int
+    district_count: int = Field(..., description="All officially recognised districts")
+    state_count: int = Field(..., description="All States and Union Territories")
+    model_district_count: int = Field(
+        0,
+        description="Districts with their own dataset city scope (direct model coverage)",
+    )
 
 
 class RiskPredictionRequest(BaseModel):
@@ -129,6 +144,11 @@ class RiskPredictionResponse(BaseModel):
     district: str
     city: str
     scope_key: str
+    model_coverage: Literal["dataset", "proxy"] = "dataset"
+    proxy_city: Optional[str] = Field(
+        None,
+        description="Dataset city used as a representative scope when coverage is 'proxy'",
+    )
     risk_percentage: float = Field(..., ge=0.0, le=100.0)
     risk_category: Literal["Low", "Medium", "High"]
     risk_lower_bound: float = Field(..., ge=0.0, le=100.0)

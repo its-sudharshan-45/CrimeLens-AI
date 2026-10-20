@@ -30,16 +30,28 @@ async def test_locations_match_dataset_and_model(client: AsyncClient):
     assert response.status_code == 200, response.text
     data = response.json()
 
-    assert data["state_count"] == 15
-    assert data["district_count"] == 29
-    assert len(data["states"]) == 15
+    # All 28 States + 8 Union Territories and their official districts.
+    assert data["state_count"] == 36
+    assert data["district_count"] == 789
+    assert len(data["states"]) == 36
+    assert data["model_district_count"] == 28  # Thane/Kalyan share one district
+
+    tamil_nadu = next(state for state in data["states"] if state["state"] == "Tamil Nadu")
+    assert len(tamil_nadu["districts"]) == 38
 
     delhi = next(state for state in data["states"] if state["state"] == "Delhi")
-    assert delhi["districts"] == [
-        {"district": "New Delhi", "city": "Delhi", "scope_key": "city:Delhi"}
-    ]
+    new_delhi = next(district for district in delhi["districts"] if district["district"] == "New Delhi")
+    assert new_delhi == {
+        "district": "New Delhi",
+        "city": "Delhi",
+        "scope_key": "city:Delhi",
+        "model_supported": True,
+        "coverage": "dataset",
+    }
 
-    # Every catalog scope must exist in the model's scope list.
+    # Every catalog scope must exist in the model's scope list.  Kalyan and
+    # Thane are two dataset cities inside the single official Thane district,
+    # so the district appears once and uses city:Thane.
     scopes = await client.get("/api/v1/ai/scopes?scope_type=city")
     model_keys = {scope["key"] for scope in scopes.json()["scopes"]}
     catalog_keys = {
@@ -47,7 +59,13 @@ async def test_locations_match_dataset_and_model(client: AsyncClient):
         for state in data["states"]
         for district in state["districts"]
     }
-    assert catalog_keys == model_keys
+    assert catalog_keys <= model_keys
+    assert model_keys - catalog_keys == {"city:Kalyan"}
+
+    # No duplicate district labels within a state.
+    for state in data["states"]:
+        labels = [district["district"] for district in state["districts"]]
+        assert len(labels) == len(set(labels)), state["state"]
 
 
 @requires_forecaster
@@ -64,6 +82,8 @@ async def test_risk_is_derived_from_model_forecast(client: AsyncClient):
     assert data["district"] == "New Delhi"
     assert data["city"] == "Delhi"
     assert data["scope_key"] == "city:Delhi"
+    assert data["model_coverage"] == "dataset"
+    assert data["proxy_city"] is None
     assert data["model_name"] == "CrimeGRUForecaster"
     assert data["model_version"] == "forecast_v1"
     assert len(data["forecast"]) == 7
@@ -105,6 +125,34 @@ async def test_risk_differs_across_districts(client: AsyncClient):
     assert high["risk_percentage"] > low["risk_percentage"]
     assert high["district_rank"] < low["district_rank"]
     assert high["predicted_daily_average"] != low["predicted_daily_average"]
+
+
+@requires_forecaster
+@pytest.mark.asyncio
+async def test_uncovered_district_uses_labelled_proxy_scope(client: AsyncClient):
+    """Districts outside the dataset are still served by a real, labelled scope."""
+    response = await client.post(
+        "/api/v1/ai/risk", json={"state": "Tamil Nadu", "district": "Coimbatore"}
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+
+    assert data["state"] == "Tamil Nadu"
+    assert data["district"] == "Coimbatore"
+    assert data["city"] == "Chennai"
+    assert data["scope_key"] == "city:Chennai"
+    assert data["model_coverage"] == "proxy"
+    assert data["proxy_city"] == "Chennai"
+    assert "representative proxy" in data["risk_method"]
+    assert 0.0 <= data["risk_percentage"] <= 100.0
+    assert len(data["forecast"]) == 7
+
+    # A reported proxy value must equal the model value for its backing scope.
+    direct = await client.post(
+        "/api/v1/ai/risk", json={"state": "Tamil Nadu", "district": "Chennai"}
+    )
+    assert direct.status_code == 200, direct.text
+    assert data["risk_percentage"] == direct.json()["risk_percentage"]
 
 
 @requires_forecaster

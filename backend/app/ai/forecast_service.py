@@ -111,7 +111,12 @@ class ForecastService:
         return [scope for scope in self.predictor.available_scopes() if scope["scope_type"] == "city"]
 
     def location_catalog(self) -> List[Dict[str, Any]]:
-        """Return states/districts that are backed by an available model scope."""
+        """Return every State/UT and district, annotated with model coverage.
+
+        All officially recognised districts are listed.  Districts without a
+        dedicated dataset city scope point at a real representative scope and
+        are marked ``coverage="proxy"`` so the UI can label them honestly.
+        """
         if not self.is_loaded and not self.load():
             raise RuntimeError(self.load_error or "Forecaster is not available.")
         cities = {scope["display_name"] for scope in self._city_scopes()}
@@ -148,8 +153,13 @@ class ForecastService:
 
         The GRU forecast gives seven daily incident counts.  The risk percentage
         is a transparent relative index: the district's predicted daily average
-        divided by the highest predicted daily average across all 29 supported
-        districts.  No value is hard-coded or sampled randomly.
+        divided by the highest predicted daily average across all 29 dataset
+        scopes.  No value is hard-coded or sampled randomly.
+
+        Districts outside the 29 dataset cities are still selectable.  They use
+        the representative scope recorded in ``STATE_PROXY_CITY`` and the reply
+        sets ``model_coverage="proxy"`` so the estimate is never presented as a
+        direct dataset observation.
         """
         if not self.is_loaded and not self.load():
             raise RuntimeError(self.load_error or "Forecaster is not available.")
@@ -194,22 +204,32 @@ class ForecastService:
         model_scores = model_metrics.get("model", {}) or {}
         baseline_scores = model_metrics.get("persistence_baseline", {}) or {}
 
+        coverage = location["coverage"]
+        risk_method = (
+            "Relative Crime Risk Index: the model-predicted average daily incident "
+            "count for this district as a percentage of the highest predicted "
+            "district average across all supported districts. It is a relative "
+            "intensity index, not a probability of crime."
+        )
+        if coverage == "proxy":
+            risk_method += (
+                f" This district has no dedicated dataset city scope; the index uses "
+                f"the model scope for {location['city']} as a representative proxy."
+            )
+
         return {
             "success": True,
             "state": location["state"],
             "district": location["district"],
             "city": location["city"],
             "scope_key": scope_key,
+            "model_coverage": coverage,
+            "proxy_city": location["city"] if coverage == "proxy" else None,
             "risk_percentage": round(risk_percentage, 1),
             "risk_category": risk_category(risk_percentage),
             "risk_lower_bound": round(risk_lower, 1),
             "risk_upper_bound": round(risk_upper, 1),
-            "risk_method": (
-                "Relative Crime Risk Index: the model-predicted average daily incident "
-                "count for this district as a percentage of the highest predicted "
-                "district average across all supported districts. It is a relative "
-                "intensity index, not a probability of crime."
-            ),
+            "risk_method": risk_method,
             "predicted_daily_average": round(float(average_daily), 2),
             "predicted_7_day_total": round(float(total_7_day), 2),
             "prediction_interval_95": {

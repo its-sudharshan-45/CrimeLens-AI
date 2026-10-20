@@ -38,10 +38,12 @@ router = APIRouter()
 @router.get(
     "/locations",
     response_model=LocationCatalogResponse,
-    summary="List States and Districts Supported by the Model",
+    summary="List All States, Union Territories and Districts",
     description=(
-        "Returns the state -> district catalog derived from the dataset's city scopes. "
-        "Every district is backed by a scope the trained GRU can serve."
+        "Returns every State/UT and officially recognised district. Each district "
+        "is annotated with the real trained-GRU scope that backs it: "
+        "`coverage='dataset'` for the 29 dataset cities, `coverage='proxy'` when a "
+        "representative dataset scope is used."
     ),
 )
 async def list_locations():
@@ -51,10 +53,17 @@ async def list_locations():
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
 
     district_count = sum(len(state["districts"]) for state in states)
+    model_district_count = sum(
+        1
+        for state in states
+        for district in state["districts"]
+        if district["model_supported"]
+    )
     return LocationCatalogResponse(
         states=states,
         district_count=district_count,
         state_count=len(states),
+        model_district_count=model_district_count,
     )
 
 
