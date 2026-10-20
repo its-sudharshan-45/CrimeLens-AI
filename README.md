@@ -11,9 +11,12 @@ the resulting risk index. Authentication, the dataset, and the trained model are
 
 ## What the application does
 
-1. The user selects a **state** and then a **district**.
+1. The user selects a **state / union territory** and then a **district**. Both pickers are
+   searchable and the district list contains every officially recognised district.
 2. The backend maps that district to the dataset's city scope and runs the trained GRU
-   forecaster for a **7-day horizon**.
+   forecaster for a **7-day horizon**. Districts that are one of the 29 dataset cities use
+   their own scope; every other district is served by a clearly labelled representative
+   (proxy) scope.
 3. The UI displays:
    - a relative **crime risk percentage**,
    - a **Low / Medium / High** risk category,
@@ -27,15 +30,21 @@ the resulting risk index. Authentication, the dataset, and the trained model are
 |------|-------|
 | Source | `Dataset/crime_dataset_india.csv` |
 | Incidents | 40,160 raw records |
-| Dataset cities | 29 |
-| States | 15 |
-| Districts | 29 (distinct labels) |
+| Dataset cities (direct model scopes) | 29 |
+| States/UTs listed in the dropdowns | 36 (28 States + 8 Union Territories) |
+| Districts listed in the dropdowns | 789 (all officially recognised districts) |
 | Crime types | 21 |
 | Raw date range | 2020-01-01 → 2023-12-31 |
 
 The dataset contains a **City** column, not state/district columns. The authoritative
 city → state → district mapping lives in `ai/forecasting/locations.py` (`CITY_GEO`) and is shared
-by model serving and dataset normalization.
+by model serving and dataset normalization. The complete State/UT → district catalogue lives in
+`ai/forecasting/india_locations.py`.
+
+Districts with a direct dataset city scope are marked `coverage="dataset"`. All other districts
+are still selectable and are marked `coverage="proxy"`; their index is computed from the
+representative dataset scope configured in `STATE_PROXY_CITY` (for example, Tamil Nadu districts
+without their own scope use the Chennai model scope).
 
 ### Risk methodology
 
@@ -96,7 +105,7 @@ All routes are under `/api/v1`.
 
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
-| `GET` | `/ai/locations` | State → district catalog backed by model scopes |
+| `GET` | `/ai/locations` | Complete State/UT → district catalog with model coverage |
 | `POST` | `/ai/risk` | Run a district risk prediction from the trained GRU |
 | `GET` | `/ai/health` | Model load status and supported scope count |
 | `GET` | `/ai/scopes` | List supported city / crime-type scopes |
@@ -117,7 +126,8 @@ Content-Type: application/json
 
 The response includes `risk_percentage`, `risk_category`, `predicted_daily_average`,
 `prediction_interval_95`, `district_rank`, `forecast` (7 days), model test metrics, and a
-disclaimer. Invalid locations return `404`; an unavailable model returns `503`.
+disclaimer. It also reports `model_coverage` (`dataset` or `proxy`) and, for proxy estimates,
+`proxy_city`. Invalid locations return `404`; an unavailable model returns `503`.
 
 Frontend routes:
 
@@ -137,7 +147,7 @@ Removed dashboard paths such as `/dashboard/reports` redirect to `/dashboard`.
 ```
 CrimeLens-AI/
 ├── ai/
-│   ├── forecasting/          # GRU model, predictor, shared location catalog
+│   ├── forecasting/          # GRU model, predictor, State/UT + district catalogues
 │   └── registry/forecast_v1/ # Checkpoint, metrics, scope series
 ├── backend/
 │   ├── app/
