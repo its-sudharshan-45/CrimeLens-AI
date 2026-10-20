@@ -15,6 +15,7 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
+import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { useAIHealth, useLocations, useRiskPrediction } from '@/hooks/useAI';
 import { formatDate } from '@/lib/utils';
 import type { RiskCategory, RiskForecastDay } from '@/types/ai';
@@ -131,10 +132,43 @@ export default function RiskPredictionPage() {
   const healthQuery = useAIHealth();
   const prediction = useRiskPrediction();
 
-  const states = locationsQuery.data?.states ?? [];
+  const states = useMemo(() => locationsQuery.data?.states ?? [], [locationsQuery.data?.states]);
   const districts = useMemo(
     () => states.find((entry) => entry.state === selectedState)?.districts ?? [],
     [states, selectedState],
+  );
+
+  const stateOptions = useMemo(
+    () =>
+      states.map((entry) => ({
+        value: entry.state,
+        label: entry.state,
+        description: `${entry.districts.length} districts`,
+      })),
+    [states],
+  );
+
+  const districtOptions = useMemo(
+    () =>
+      districts.map((entry) => ({
+        value: entry.district,
+        label: entry.district,
+        description: entry.model_supported
+          ? `Direct dataset coverage · ${entry.city} scope`
+          : `Estimated from ${entry.city} scope`,
+        keywords: entry.city,
+      })),
+    [districts],
+  );
+
+  const directDistrictCount = useMemo(
+    () => districts.filter((entry) => entry.model_supported).length,
+    [districts],
+  );
+
+  const selectedDistrictEntry = useMemo(
+    () => districts.find((entry) => entry.district === selectedDistrict),
+    [districts, selectedDistrict],
   );
 
   const handleStateChange = (value: string) => {
@@ -201,7 +235,9 @@ export default function RiskPredictionPage() {
             <div>
               <h2 className="text-sm font-semibold text-foreground">Choose a jurisdiction</h2>
               <p className="text-xs text-muted-foreground">
-                Districts are mapped to the city-level scopes the trained model was evaluated on.
+                All 789 districts across 36 States and Union Territories are listed. Districts with a
+                direct dataset scope use their own model; the rest show an estimate from a
+                representative city scope.
               </p>
             </div>
           </div>
@@ -226,44 +262,57 @@ export default function RiskPredictionPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <Label htmlFor="state-select" required>
-                State
+                State / Union Territory
               </Label>
-              <select
+              <SearchableSelect
                 id="state-select"
                 value={selectedState}
-                onChange={(event) => handleStateChange(event.target.value)}
+                onChange={handleStateChange}
+                options={stateOptions}
+                placeholder={locationsQuery.isLoading ? 'Loading states…' : 'Search or select a state'}
+                searchPlaceholder="Search states and UTs…"
+                emptyMessage="No matching state or UT"
                 disabled={locationsQuery.isLoading || states.length === 0}
-                className="h-11 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="">{locationsQuery.isLoading ? 'Loading states…' : 'Select a state'}</option>
-                {states.map((entry) => (
-                  <option key={entry.state} value={entry.state}>
-                    {entry.state}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div>
               <Label htmlFor="district-select" required>
                 District
               </Label>
-              <select
+              <SearchableSelect
                 id="district-select"
                 value={selectedDistrict}
-                onChange={(event) => handleDistrictChange(event.target.value)}
+                onChange={handleDistrictChange}
+                options={districtOptions}
+                placeholder={selectedState ? 'Search or select a district' : 'Select a state first'}
+                searchPlaceholder="Search districts…"
+                emptyMessage="No matching district"
                 disabled={!selectedState || districts.length === 0}
-                className="h-11 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="">{selectedState ? 'Select a district' : 'Select a state first'}</option>
-                {districts.map((entry) => (
-                  <option key={entry.scope_key} value={entry.district}>
-                    {entry.district}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
           </div>
+
+          {selectedState && districts.length > 0 && (
+            <p className="text-[11px] text-muted-foreground">
+              {districts.length} districts in {selectedState}
+              {directDistrictCount > 0
+                ? ` · ${directDistrictCount} with direct dataset coverage`
+                : ' · estimated from a representative dataset scope'}
+            </p>
+          )}
+
+          {selectedDistrictEntry?.coverage === 'proxy' && (
+            <div className="flex items-start gap-2 rounded-xl border border-amber-500/25 bg-amber-500/5 p-3">
+              <Info size={14} className="mt-0.5 shrink-0 text-amber-400" />
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
+                <span className="font-medium text-foreground">{selectedDistrictEntry.district}</span> is
+                not one of the dataset cities. The risk index will be estimated from the{' '}
+                <span className="font-medium text-foreground">{selectedDistrictEntry.city}</span> model
+                scope and labelled as a proxy estimate.
+              </p>
+            </div>
+          )}
 
           {validationError && (
             <p className="flex items-center gap-1.5 text-xs text-red-400" role="alert">
@@ -327,16 +376,38 @@ export default function RiskPredictionPage() {
                   {result.state} <span className="text-muted-foreground">/</span> {result.district}
                 </h2>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Dataset scope: <span className="font-medium text-foreground">{result.city}</span> · Model:{' '}
+                  Dataset scope: <span className="font-medium text-foreground">{result.city}</span> ·
+                  Coverage:{' '}
+                  <span className="font-medium text-foreground">
+                    {result.model_coverage === 'dataset' ? 'direct' : `proxy (${result.proxy_city})`}
+                  </span>{' '}
+                  · Model:{' '}
                   <span className="font-medium text-foreground">
                     {result.model_name} {result.model_version}
                   </span>
                 </p>
               </div>
-              <Badge variant={tone.badge} dot className="self-start text-sm">
-                {tone.label}
-              </Badge>
+              <div className="flex flex-wrap items-center gap-2 self-start">
+                <Badge variant={result.model_coverage === 'dataset' ? 'emerald' : 'amber'}>
+                  {result.model_coverage === 'dataset' ? 'Direct dataset scope' : 'Proxy estimate'}
+                </Badge>
+                <Badge variant={tone.badge} dot className="text-sm">
+                  {tone.label}
+                </Badge>
+              </div>
             </div>
+
+            {result.model_coverage === 'proxy' && (
+              <div className="flex items-start gap-2.5 border-b border-border bg-amber-500/5 px-5 py-3 sm:px-6">
+                <AlertTriangle size={14} className="mt-0.5 shrink-0 text-amber-400" />
+                <p className="text-[11px] leading-relaxed text-muted-foreground">
+                  <span className="font-medium text-foreground">{result.district}</span> is not a
+                  dataset city. This index is estimated from the{' '}
+                  <span className="font-medium text-foreground">{result.city}</span> model scope and
+                  should be read as a regional proxy, not a district-specific observation.
+                </p>
+              </div>
+            )}
 
             <div className="grid items-center gap-6 p-5 sm:p-6 lg:grid-cols-[210px_1fr]">
               <RiskGauge score={result.risk_percentage} category={result.risk_category} />
@@ -353,13 +424,17 @@ export default function RiskPredictionPage() {
                   hint={`Forecast from ${formatDate(result.last_observed_date)}`}
                 />
                 <MetricTile
-                  label="District rank"
+                  label={result.model_coverage === 'proxy' ? 'Backing scope rank' : 'District rank'}
                   value={
                     result.district_rank
                       ? `#${result.district_rank} of ${result.district_count}`
                       : `— of ${result.district_count}`
                   }
-                  hint="By predicted daily incident volume"
+                  hint={
+                    result.model_coverage === 'proxy'
+                      ? `Rank of the ${result.city} scope by predicted volume`
+                      : 'By predicted daily incident volume'
+                  }
                 />
                 <MetricTile
                   label="Historical data"

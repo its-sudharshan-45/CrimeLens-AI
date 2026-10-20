@@ -8,10 +8,16 @@
 
 export type RiskCategory = 'Low' | 'Medium' | 'High';
 
+export type ModelCoverage = 'dataset' | 'proxy';
+
 export interface DistrictLocation {
   district: string;
+  /** Dataset city whose trained scope backs this district (direct or proxy). */
   city: string;
   scope_key: string;
+  /** True when the district is one of the dataset's city scopes. */
+  model_supported: boolean;
+  coverage: ModelCoverage;
 }
 
 export interface StateLocations {
@@ -21,8 +27,12 @@ export interface StateLocations {
 
 export interface LocationCatalogResponse {
   states: StateLocations[];
+  /** All officially recognised districts (789). */
   district_count: number;
+  /** All 28 States and 8 Union Territories. */
   state_count: number;
+  /** Districts with their own dataset city scope (28 unique districts). */
+  model_district_count: number;
 }
 
 export interface RiskPredictionRequest {
@@ -53,6 +63,8 @@ export interface RiskPredictionResponse {
   district: string;
   city: string;
   scope_key: string;
+  model_coverage: ModelCoverage;
+  proxy_city: string | null;
   risk_percentage: number;
   risk_category: RiskCategory;
   risk_lower_bound: number;

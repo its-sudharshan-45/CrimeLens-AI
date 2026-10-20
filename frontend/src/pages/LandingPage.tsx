@@ -8,8 +8,8 @@ import { useAuth } from '@/hooks/useAuth';
 
 const datasetStats = [
   { label: 'Historical incidents', value: '40,160' },
-  { label: 'Districts covered', value: '29' },
-  { label: 'States covered', value: '15' },
+  { label: 'States & UTs listed', value: '36' },
+  { label: 'Districts listed', value: '789' },
   { label: 'Forecast horizon', value: '7 days' },
 ];
 
@@ -18,7 +18,7 @@ const capabilities = [
     icon: MapPin,
     title: 'State and district selection',
     description:
-      'Choose from the 29 city-level scopes the trained model was evaluated on, mapped to their Indian state and district.',
+      'Search all 789 districts across 36 States and Union Territories. Districts with a direct dataset scope use their own model; the rest are clearly labelled proxy estimates.',
   },
   {
     icon: Brain,
